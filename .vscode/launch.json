@@ -1,0 +1,38 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "java",
+			"name": "Launch AstPrinter",
+			"request": "launch",
+			"mainClass": "com.craftinginterpreters.jlox.AstPrinter",
+			"projectName": "jlox_52d37a56"
+		},
+		{
+			"type": "java",
+			"name": "Launch Current File",
+			"request": "launch",
+			"mainClass": "${file}"
+		},
+		{
+			"type": "java",
+			"name": "Launch Lox",
+			"request": "launch",
+			"mainClass": "com.craftinginterpreters.jlox.Lox",
+			"projectName": "jlox_52d37a56"
+		},
+		{
+			"type": "java",
+			"name": "Generate AST",
+			"request": "launch",
+			"mainClass": "com.craftinginterpreters.tool.GenerateAST",
+			"projectName": "jlox_52d37a56",
+			"args": [
+				"src/com/craftinginterpreters/jlox"
+			]
+		}
+	]
+}
