@@ -1,6 +1,7 @@
 package com.craftinginterpreters.jlox;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.craftinginterpreters.jlox.TokenType.*;
@@ -57,6 +58,15 @@ public class Parser {
 		if (match(LEFT_BRACE)) {
 			return new Stmt.Block(block());
 		}
+		if (match(IF)) {
+			return ifStatement();
+		}
+		if (match(WHILE)) {
+			return whileStatement();
+		}
+		if (match(FOR)) {
+			return forStatement();
+		}
 		if (match(PRINT)) {
 			return printStatement();
 		}
@@ -75,6 +85,85 @@ public class Parser {
 		consume(RIGHT_BRACE, "Expected '}' after block.");
 		// return new Stmt.Block(statements);
 		return statements;
+	}
+
+	//* Parse an if statement.
+	private Stmt ifStatement() {
+		consume(LEFT_PAREN, "Expected '(' after 'if'.");
+		Expr condition = expression();
+		consume(RIGHT_PAREN, "Expected ')' after if condition.");
+
+		Stmt thenBranch = statement();
+		Stmt elseBranch = null;
+
+		if (match(ELSE)) {
+			elseBranch = statement();
+		}
+
+		return new Stmt.If(condition, thenBranch, elseBranch);
+	}
+
+	//* Parses a while statement.
+	private Stmt whileStatement() {
+		consume(LEFT_PAREN, "Expected '(' after 'while'.");
+		Expr condition = expression();
+		consume(RIGHT_PAREN, "Expected ')' after condition.");
+		Stmt body = statement();
+
+		return new Stmt.While(condition, body);
+	}
+
+	//* Parses a for loop and 'desugars' it (transforms to more basic primitives)
+	private Stmt forStatement() {
+		consume(LEFT_PAREN, "Expected '(' after 'for'.");
+
+		Stmt initializer;
+		if (match(SEMICOLON)) {
+			initializer = null;
+		} else if (match(VAR)) {
+			initializer = varDeclaration();
+		} else {
+			initializer = expressionStatement();
+		}
+
+		Expr condition = null;
+		if (!check(SEMICOLON)) {
+			condition = expression();
+		}
+
+		consume(SEMICOLON, "Expected ';' after 'for' condition.");
+
+		Expr increment = null;
+		if (!check(RIGHT_PAREN)) {
+			increment = expression();
+		}
+
+		consume(RIGHT_PAREN, "Expected ')' after 'for' clauses.");
+
+		Stmt body = statement();
+
+		// Conduct desugaring!
+		// Append increment to the end of the body
+		if (increment != null) {
+			body = new Stmt.Block(
+					Arrays.asList(
+							body,
+							new Stmt.Expression(increment)));
+		}
+		
+		// If no condition was given, make it an infinite loop
+		if (condition == null) {
+			condition = new Expr.Literal(true);
+		}
+		body = new Stmt.While(condition, body);
+
+		// Prepend the initializer
+		if (initializer != null) {
+			body = new Stmt.Block(Arrays.asList(initializer, body));
+		}
+
+		return body;
+
 	}
 
 	//* Parse a print statement. Note that the 'print' was consumed by the statement() method.
@@ -98,7 +187,7 @@ public class Parser {
 
 	//* Parse an assignment (=) expression.
 	private Expr assignment() {
-		Expr expr = equality();
+		Expr expr = logical_or();
 
 		if (match(EQUAL)) {
 			Token equals = previous();
@@ -111,6 +200,32 @@ public class Parser {
 			}
 
 			throw error(equals, "Invalid assignment target.");
+		}
+
+		return expr;
+	}
+
+	//* Parses a logical OR expression.
+	private Expr logical_or() {
+		Expr expr = logical_and();
+
+		while (match(OR)) {
+			Token operator = previous();
+			Expr right = logical_and();
+			expr = new Expr.Logical(operator, expr, right);
+		}
+
+		return expr;
+	}
+
+	//* Parses a logical AND expression.
+	private Expr logical_and() {
+		Expr expr = equality();
+
+		while (match(AND)) {
+			Token operator = previous();
+			Expr right = equality();
+			expr = new Expr.Logical(operator, expr, right);
 		}
 
 		return expr;

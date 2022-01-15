@@ -22,7 +22,8 @@ public class GenerateAST {
 				"Grouping : Expr expression",
 				"Literal  : Object value",
 				"Variable : Token name",
-				"Assign   : Token name, Expr value"
+				"Assign   : Token name, Expr value",
+				"Logical  : Token operator, Expr left, Expr right"
 		));
 
 		// Create statement nodes
@@ -30,7 +31,9 @@ public class GenerateAST {
 				"Block      : List<Stmt> statements",
 				"Expression : Expr expression",
 				"Print      : Expr expression",
-				"Var        : Token name, Expr initializer"
+				"Var        : Token name, Expr initializer",
+				"If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
+				"While      : Expr condition, Stmt body"
 		));
 	}
 	
