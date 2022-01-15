@@ -38,7 +38,7 @@ public class Lox {
 		// Read the file
 		byte[] bytes = Files.readAllBytes(Paths.get(path));
 		// Execute the file
-		run(new String(bytes, Charset.defaultCharset()));
+		run(new String(bytes, Charset.defaultCharset()), false);
 
 		// Error codes
 		if (hadError)
@@ -58,24 +58,24 @@ public class Lox {
 			String line = reader.readLine();
 			if (line == null)
 				break;
-			run(line);
+			run(line, true);
 			// Each prompt is separate.
 			hadError = false;
 		}
 	}
 
 	//* Runs a Lox program.
-	private static void run(String source) {
+	private static void run(String source, boolean isREPL) {
 		Scanner scanner = new Scanner(source);
 		List<Token> tokens = scanner.scanTokens();
 
-		Parser parser = new Parser(tokens);
+		Parser parser = new Parser(tokens, isREPL);
 		List<Stmt> statements = parser.parse();
 
 		if (hadError)
 			return;
 
-		// System.out.println(new AstPrinter().print(expression));
+		// System.out.println(new AstPrinter().print(statements));
 		interpreter.interpret(statements);
 
 	}

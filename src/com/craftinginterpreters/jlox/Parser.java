@@ -8,11 +8,14 @@ import static com.craftinginterpreters.jlox.TokenType.*;
 public class Parser {
 	private static class ParseError extends RuntimeException {}
 
-	private final List<Token> tokens;
-	private int current = 0;
+	private final List<Token> tokens; // The tokens to parse
+	private int current = 0; // Current token index in 'tokens'
 
-	public Parser(List<Token> tokens) {
+	private final boolean isREPL; // Whether the parser was started in REPL mode
+
+	public Parser(List<Token> tokens, boolean isREPL) {
 		this.tokens = tokens;
+		this.isREPL = isREPL;
 	}
 
 	public List<Stmt> parse() {
@@ -48,7 +51,9 @@ public class Parser {
 			initializer = expression();
 		}
 
-		consume(SEMICOLON, "Expected ';' after variable declaration.");
+		if (!isREPL || !isAtEnd())
+			consume(SEMICOLON, "Expected ';' after variable declaration.");
+		
 		return new Stmt.Var(name, initializer);
 	}
 
@@ -80,14 +85,21 @@ public class Parser {
 	//* Parse a print statement. Note that the 'print' was consumed by the statement() method.
 	private Stmt printStatement() {
 		Expr value = expression();
-		consume(SEMICOLON, "Expected ';' after expression.");
+
+		if (!isREPL || !isAtEnd())
+			consume(SEMICOLON, "Expected ';' after expression.");
+	
 		return new Stmt.Print(value);
 	}
 
 	//* Parse an expression statement.
 	private Stmt expressionStatement() {
 		Expr expr = expression();
-		consume(SEMICOLON, "Expected ';' after expression.");
+
+		// If in REPL mode and at the end, the ';' is optional
+		if (!isREPL || !isAtEnd())
+			consume(SEMICOLON, "Expected ';' after expression.");
+		
 		return new Stmt.Expression(expr);
 	}
 
