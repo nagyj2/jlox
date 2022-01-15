@@ -1,5 +1,6 @@
 package com.craftinginterpreters.jlox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.craftinginterpreters.jlox.TokenType.*;
@@ -14,35 +15,122 @@ public class Parser {
 		this.tokens = tokens;
 	}
 
-	public Expr parse() {
-		try {
-			return expression();
-		} catch (ParseError error) {
-			return null;
+	public List<Stmt> parse() {
+		List<Stmt> statements = new ArrayList<Stmt>();
+		while (!isAtEnd()) { // Checks for EOF
+			statements.add(declaration());
 		}
+
+		return statements;
 	}
 
 	//~ Productions
 
-	//* Entry function for parsing an expression. Allows for comma expressions.
+	private Stmt declaration() {
+		try {
+			if (match(VAR))
+				return varDeclaration();
+
+			return statement();
+
+		} catch (ParseError error) {
+			synchronize();
+			return null;
+		}
+	}
+	
+	//* Parse a variable declaration. Note that the 'var' was consumed by the declaration() method.
+	private Stmt varDeclaration() {
+		Token name = consume(IDENTIFIER, "Expected variable name.");
+
+		Expr initializer = null;
+		if (match(EQUAL)) {
+			initializer = expression();
+		}
+
+		consume(SEMICOLON, "Expected ';' after variable declaration.");
+		return new Stmt.Var(name, initializer);
+	}
+
+	//* Parse a statement.
+	private Stmt statement() {
+		if (match(LEFT_BRACE)) {
+			return new Stmt.Block(block());
+		}
+		if (match(PRINT)) {
+			return printStatement();
+		}
+
+		return expressionStatement();
+	}
+
+	//* Parses a group of statements. Return is a list of statements, as opposed to a single statement.
+	private List<Stmt> block() {
+		List<Stmt> statements = new ArrayList<>();
+
+		while (!check(RIGHT_BRACE) && !isAtEnd()) {
+			statements.add(declaration());
+		}
+
+		consume(RIGHT_BRACE, "Expected '}' after block.");
+		// return new Stmt.Block(statements);
+		return statements;
+	}
+
+	//* Parse a print statement. Note that the 'print' was consumed by the statement() method.
+	private Stmt printStatement() {
+		Expr value = expression();
+		consume(SEMICOLON, "Expected ';' after expression.");
+		return new Stmt.Print(value);
+	}
+
+	//* Parse an expression statement.
+	private Stmt expressionStatement() {
+		Expr expr = expression();
+		consume(SEMICOLON, "Expected ';' after expression.");
+		return new Stmt.Expression(expr);
+	}
+
+	//* Parse an expression.
 	private Expr expression() {
+		Expr expr = assignment();
+
+	while (match(COMMA)) {
+		if (!isPrimaryNext()) {
+			error(isAtEnd() ? peek() : previous(), "Expected second operand.");
+			return expr;
+		}
+		
+		Expr right = assignment();
+		expr = new Expr.Sequence(expr, right);
+	}
+
+	return expr;
+	}
+
+	//* Parse an assignment (=) expression.
+	private Expr assignment() {
 		Expr expr = conditional();
 
-		while (match(COMMA)) {
-			if (!isPrimaryNext()) {
-				error(isAtEnd() ? peek() : previous(), "Expected second operand.");
-				return expr;
+		if (match(EQUAL)) {
+			Token equals = previous();
+			// b/c assignment is right associative, call this level recursively
+			Expr value = assignment();
+
+			if (expr instanceof Expr.Variable) {
+				Token name = ((Expr.Variable) expr).name;
+				return new Expr.Assign(name, value);
 			}
-			
-			Expr right = conditional();
-			expr = new Expr.Sequence(expr, right);
+
+			throw error(equals, "Invalid assignment target.");
 		}
 
 		return expr;
 	}
 
+
 	//* Parse an ternary conditional expression.
-	private Expr conditional(){
+	private Expr conditional() {
 		Expr expr = equality();
 
 		while (match(QUESTION)) {
@@ -165,6 +253,8 @@ public class Parser {
 			return new Expr.Literal(null);
 		if (match(NUMBER, STRING))
 			return new Expr.Literal(previous().literal);
+		if (match(IDENTIFIER))
+			return new Expr.Variable(previous());
 		if (match(LEFT_PAREN)) {
 			Expr expr = expression();
 			consume(RIGHT_PAREN, "Expected ')' after expression.");
@@ -229,11 +319,11 @@ public class Parser {
 	}
 
 	//* Consumes the current token if it matches the given token type. Otherwise, throws an error.
-	private void consume(TokenType type, String message) {
+	private Token consume(TokenType type, String message) {
 		if (check(type))
-			advance();
+			return advance();
 		else
-			error(peek(), message);
+			throw error(peek(), message);
 	}
 
 	//~ Error Handling

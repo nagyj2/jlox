@@ -37,7 +37,19 @@ primary         -> NUMBER
 
 Below is the grammar for xlox up to this point:
 ```
-expression      -> equality ;
+program         -> declarations* EOF ;
+declarations    -> varDecl
+                 | statement ;
+varDecl         -> "var" IDENTIFIER ( "=" expression )? ";" ;
+statement       -> block
+                 | printStmt
+                 | exprStmt ;
+block           -> "{" declarations* "}" ;
+printStmt       -> "print" expr ";" ;
+exprStmt        -> expression ";" ;
+expression      -> assignment ;
+assignment      -> IDENTIFIER "=" assignment
+                 | equality ;
 equality        -> comparison ( ( "==" | "!=" ) comparison )* ;
 comparison      -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term            -> factor ( ( "+" | "-" ) factor )* ;
@@ -46,6 +58,7 @@ unary           -> ( "!" | "-" ) unary
                  | unary ;
 primary         -> NUMBER
                  | STRING
+                 | IDENTIFIER
                  | "true" | "false" | "nil" ;
                  | "(" expression ")"
 ```

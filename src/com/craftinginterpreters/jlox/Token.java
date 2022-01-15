@@ -1,10 +1,14 @@
 package com.craftinginterpreters.jlox;
 
 public class Token {
-	final TokenType type; // type of the token
-	final String lexeme;  // what appears in the source code
-	final Object literal; // value of the token
-	final int line; 			// the line the token appears on
+	//* The type of the token.
+	final TokenType type;
+	//* The token as it appears in the source code.
+	final String lexeme;
+	//* The Java literal which corresponds to the token. Only filled if the token is a number, string, or boolean.
+	final Object literal;
+	//* The line number of the token in the source code.
+	final int line;
 
 	Token(TokenType type, String lexeme, Object literal, int line) {
 		this.type = type;

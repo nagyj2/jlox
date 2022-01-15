@@ -15,13 +15,24 @@ public class GenerateAST {
 
 		String outputDir = args[0];
 
+		//Create expression nodes
 		defineAst(outputDir, "Expr", Arrays.asList(
-				"Binary : Token operator, Expr left, Expr right",
-				"Unary : Token operator, Expr right",
+				"Binary   : Token operator, Expr left, Expr right",
+				"Unary    : Token operator, Expr right",
 				"Grouping : Expr expression",
-				"Literal : Object value",
+				"Literal  : Object value",
+				"Variable : Token name",
+				"Assign   : Token name, Expr value",
 				"Sequence : Expr first, Expr second",
 				"Ternary : Token operator, Expr left, Expr center, Expr right"
+		));
+
+		// Create statement nodes
+		defineAst(outputDir, "Stmt", Arrays.asList(
+				"Block      : List<Stmt> statements",
+				"Expression : Expr expression",
+				"Print      : Expr expression",
+				"Var        : Token name, Expr initializer"
 		));
 	}
 	
