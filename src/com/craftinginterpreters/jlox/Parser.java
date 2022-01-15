@@ -269,6 +269,12 @@ public class Parser {
 
 		while (match(OR)) {
 			Token operator = previous();
+
+			if (!isPrimaryNext()) {
+				error(isAtEnd() ? peek() : previous(), "Expected second operand.");
+				return expr;
+			}
+
 			Expr right = logical_and();
 			expr = new Expr.Logical(operator, expr, right);
 		}
@@ -282,6 +288,12 @@ public class Parser {
 
 		while (match(AND)) {
 			Token operator = previous();
+			
+			if (!isPrimaryNext()) {
+				error(isAtEnd() ? peek() : previous(), "Expected second operand.");
+				return expr;
+			}
+
 			Expr right = equality();
 			expr = new Expr.Logical(operator, expr, right);
 		}

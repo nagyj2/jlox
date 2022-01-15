@@ -29,14 +29,20 @@ assignment      -> IDENTIFIER "=" assignment
                  | conditional ;
 conditional     -> logic_or ( "?" logic_or ":" conditional )* 
                  | logic_or "?" ":"
-                 | logic_or "?" logic_or ":" ;
+                 | logic_or "?" logic_or ":"
                  | logic_or ;
-logic_or        -> logic_and ( "or" logic_and )* ;
-logic_and       -> equality ( "and" equality )* ;
-equality        -> comparison ( ( "==" | "!=" ) comparison )* ;
-comparison      -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-term            -> factor ( ( "+" | "-" ) factor )* ;
-factor          -> unary ( ( "*" | "/" ) unary )* ;
+logic_or        -> logic_and ( "or" logic_and )*
+                 | logic_and "or ;
+logic_and       -> equality ( "and" equality )* 
+                 | equality "and" ;
+equality        -> comparison ( ( "==" | "!=" ) comparison )* 
+                 | comparison ( "==" | "!=" ) ;
+comparison      -> term ( ( ">" | ">=" | "<" | "<=" ) term )* 
+                 | term ( ">" | ">=" | "<" | "<=" );
+term            -> factor ( ( "+" | "-" ) factor )* 
+                 | factor ( "+" | "-" ) ;
+factor          -> unary ( ( "*" | "/" ) unary )* 
+                 | unary ( "*" | "/" ) ;
 unary           -> ( "!" | "-" ) unary 
                  | unary ;
 primary         -> NUMBER
@@ -48,9 +54,10 @@ primary         -> NUMBER
 
 ### Modifications
 
-- Planned use of '<-' for inheritance
 - Comma expressions
 - Ternary operator
+- More capable error checking
+  - Missing operands
 
 ### Types
 
