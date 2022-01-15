@@ -1,10 +1,33 @@
-## jlox
+## xlox
 
-jlox (jay-locks) is a small language defined in the book 'Crafting Interpreters'. This project implements the language as it appears in the book.
+xlox (ecks-locks) is a small language based off the Lox language in the book 'Crafting Interpreters'. This project implements some of the proposed challenges in the book and some personal modifications.
+
+### Grammar
+
+Below is the grammar for xlox up to this point:
+```
+expression -> equality ( "," equality )* ;
+equality   -> comparison ( ( "==" | "!=" ) comparison )* ;
+comparison -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term       -> factor ( ( "+" | "-" ) factor )* ;
+factor     -> unary ( "*" | "/" ) factor ;
+unary      -> ( "!" | "-" ) unary 
+            | unary ;
+primary    -> NUMBER
+            | STRING
+            | "true" | "false" | "nil" ;
+            | "(" expression ")"
+```
+
+### Modifications
+
+- Planned use of '<-' for inheritance
+- Comma expressions
+- Ternary operator
 
 ### Types
 
-jlox is a dynamically typed language which supports the following types:
+xlox is a dynamically typed language which supports the following types:
 - Booleans
 - Numbers (integers and floating point)
 - Strings
@@ -12,7 +35,7 @@ jlox is a dynamically typed language which supports the following types:
 
 ### Operations
 
-jlox supports the following operations:
+xlox supports the following operations:
 - Arithmetic
   - Addition
   - Subtraction
@@ -37,7 +60,7 @@ jlox supports the following operations:
 
 ### Statements
 
-All statements in jlox end with a semicolon. A semicolon can also be added to a value expression to promote it to an expression statement. jlox uses C-like syntax for creating code blocks. Variables can be created with the 'var' keyword and have the default value of nil unless an initializer is provided. Printing is also supported as a statement instead of a library function. For control flow, if, while, and for statements are supported. Functions can be called using the expression syntax, are user creatable and can return a value. Functions are first class and can be nested. Classes can also be declared and subclassed. Classes contain state and methods.
+All statements in xlox end with a semicolon. A semicolon can also be added to a value expression to promote it to an expression statement. xlox uses C-like syntax for creating code blocks. Variables can be created with the 'var' keyword and have the default value of nil unless an initializer is provided. Printing is also supported as a statement instead of a library function. For control flow, if, while, and for statements are supported. Functions can be called using the expression syntax, are user creatable and can return a value. Functions are first class and can be nested. Classes can also be declared and subclassed. Classes contain state and methods.
 
 In short, the language features:
 - Variable assignment

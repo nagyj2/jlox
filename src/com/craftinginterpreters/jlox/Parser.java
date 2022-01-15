@@ -24,8 +24,16 @@ public class Parser {
 
 	//~ Productions
 
+	//* Entry function for parsing an expression. Allows for comma expressions.
 	private Expr expression() {
-		return equality();
+		Expr expr = equality();
+
+		while (match(COMMA)) {
+			Expr right = equality();
+			expr = new Expr.Sequence(expr, right);
+		}
+
+		return expr;
 	}
 
 	//* Parse an equality (== or !=) expression.
