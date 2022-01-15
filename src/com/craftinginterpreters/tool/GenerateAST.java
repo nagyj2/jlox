@@ -16,11 +16,12 @@ public class GenerateAST {
 		String outputDir = args[0];
 
 		defineAst(outputDir, "Expr", Arrays.asList(
-				"Binary : Expr left, Token operator, Expr right",
+				"Binary : Token operator, Expr left, Expr right",
 				"Unary : Token operator, Expr right",
 				"Grouping : Expr expression",
 				"Literal : Object value",
-				"Sequence : Expr first, Expr second"
+				"Sequence : Expr first, Expr second",
+				"Ternary : Token operator, Expr left, Expr center, Expr right"
 		));
 	}
 	

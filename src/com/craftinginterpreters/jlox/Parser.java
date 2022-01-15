@@ -26,11 +26,26 @@ public class Parser {
 
 	//* Entry function for parsing an expression. Allows for comma expressions.
 	private Expr expression() {
-		Expr expr = equality();
+		Expr expr = conditional();
 
 		while (match(COMMA)) {
-			Expr right = equality();
+			Expr right = conditional();
 			expr = new Expr.Sequence(expr, right);
+		}
+
+		return expr;
+	}
+
+	//* Parse an ternary conditional expression.
+	private Expr conditional(){
+		Expr expr = equality();
+
+		while (match(QUESTION)) {
+			Token operator = previous();
+			Expr center = conditional();
+			consume(COLON, "Expected ':' after '?' true expression.");
+			Expr right = conditional();
+			expr = new Expr.Ternary(operator, expr, center, right);
 		}
 
 		return expr;
@@ -43,7 +58,7 @@ public class Parser {
 		while (match(BANG_EQUAL, EQUAL_EQUAL)) {
 			Token operator = previous();
 			Expr right = comparison();
-			expr = new Expr.Binary(expr, operator, right);
+			expr = new Expr.Binary(operator, expr, right);
 		}
 
 		return expr;
@@ -56,7 +71,7 @@ public class Parser {
 		while (match(LESSER, GREATER, LESSER_EQUAL, GREATER_EQUAL)) {
 			Token operator = previous();
 			Expr right = term();
-			expr = new Expr.Binary(expr, operator, right);
+			expr = new Expr.Binary(operator, expr, right);
 		}
 
 		return expr;
@@ -69,7 +84,7 @@ public class Parser {
 		while (match(MINUS, PLUS)) {
 			Token operator = previous();
 			Expr right = factor();
-			expr = new Expr.Binary(expr, operator, right);
+			expr = new Expr.Binary(operator, expr, right);
 		}
 
 		return expr;
@@ -82,7 +97,7 @@ public class Parser {
 		while (match(STAR, SLASH)) {
 			Token operator = previous();
 			Expr right = unary();
-			expr = new Expr.Binary(expr, operator, right);
+			expr = new Expr.Binary(operator, expr, right);
 		}
 
 		return expr;

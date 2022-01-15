@@ -94,6 +94,12 @@ public class Scanner {
 			case '*':
 				addToken(STAR);
 				break;
+			case ':':
+				addToken(COLON);
+				break;
+			case '?':
+				addToken(QUESTION);
+				break;
 
 			case ' ':
 			case '\t':
