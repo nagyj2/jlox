@@ -33,6 +33,23 @@ primary         -> NUMBER
 - Comma expressions
 - Ternary operator
 
+### Grammar
+
+Below is the grammar for xlox up to this point:
+```
+expression      -> equality ;
+equality        -> comparison ( ( "==" | "!=" ) comparison )* ;
+comparison      -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term            -> factor ( ( "+" | "-" ) factor )* ;
+factor          -> unary ( ( "*" | "/" ) unary )* ;
+unary           -> ( "!" | "-" ) unary 
+                 | unary ;
+primary         -> NUMBER
+                 | STRING
+                 | "true" | "false" | "nil" ;
+                 | "(" expression ")"
+```
+
 ### Types
 
 xlox is a dynamically typed language which supports the following types:
