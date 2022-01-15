@@ -75,6 +75,9 @@ public class Parser {
 		if (match(PRINT)) {
 			return printStatement();
 		}
+		if (match(BREAK)) {
+			return breakStatement();
+		}
 
 		return expressionStatement();
 	}
@@ -155,7 +158,7 @@ public class Parser {
 							body,
 							new Stmt.Expression(increment)));
 		}
-		
+
 		// If no condition was given, make it an infinite loop
 		if (condition == null) {
 			condition = new Expr.Literal(true);
@@ -169,6 +172,16 @@ public class Parser {
 
 		return body;
 
+	}
+	
+	private Stmt breakStatement() {
+
+		Token _break = previous();
+		
+		if (!isREPL || !isAtEnd())
+			consume(SEMICOLON, "Expected ';' after expression.");
+
+		return new Stmt.Break(_break);
 	}
 
 	//* Parse a print statement. Note that the 'print' was consumed by the statement() method.

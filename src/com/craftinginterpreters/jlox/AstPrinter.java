@@ -47,6 +47,11 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 		return builder.toString();
 	}
 
+	@Override
+	public String visitBreakStmt(Stmt.Break stmt) {
+		return "break";
+	}
+
 	//~ Expressions
 
 	@Override

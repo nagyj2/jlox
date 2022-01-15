@@ -14,12 +14,14 @@ statement       -> block
                  | ifStmt
                  | whileStmt
                  | forStmt
+                 | breakStmt
                  | printStmt
                  | exprStmt ;
 block           -> "{" declarations* "}" ;
 ifStmt          -> "if" "(" expression ")" statement ( "else" statement )? ;
 whileStmt       -> "while" "(" expression ")" statement ;
 forStmt         -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
+breakStmt       -> "break" ";" ;
 printStmt       -> "print" expr ";" ;
 exprStmt        -> expression ";" ;
 expression      -> assignment ( "," assignment )*
@@ -58,6 +60,9 @@ primary         -> NUMBER
 - Ternary operator
 - More capable error checking
   - Missing operands
+  - Division by zero
+- Auto conversion for string concatenation
+- `break` statement
 
 ### Types
 

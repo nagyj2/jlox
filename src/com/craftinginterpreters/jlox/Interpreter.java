@@ -11,6 +11,15 @@ class RuntimeError extends RuntimeException {
 	}
 }
 
+class StopIteration extends RuntimeException {
+	final Token token;
+
+	public StopIteration(Token token, String message) {
+		super(message);
+		this.token = token;
+	}
+}
+
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 	private Environment environment = new Environment();
@@ -23,6 +32,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			}
 		} catch (RuntimeError error) {
 			Lox.runtimeError(error);
+		} catch (StopIteration error) {
+			Lox.runtimeError(new RuntimeError(error.token, "Unexpected '" + error.token.lexeme + "' outside loop."));
 		}
 	}
 	
@@ -82,11 +93,22 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 	@Override
 	public Void visitWhileStmt(Stmt.While stmt) {
-		while (isTruthy(evaluate(stmt.condition))) {
-			execute(stmt.body);
+		try {
+			while (isTruthy(evaluate(stmt.condition))) {
+				execute(stmt.body);
+			}
+
+		} catch (StopIteration error) {
+			return null;
+
 		}
-		
+
 		return null;
+	}
+	
+	@Override
+	public Void visitBreakStmt(Stmt.Break stmt) {
+		throw new StopIteration(stmt.token, "");
 	}
 
 	//~ Expression Evaluation

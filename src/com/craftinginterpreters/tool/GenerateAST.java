@@ -30,6 +30,7 @@ public class GenerateAST {
 
 		// Create statement nodes
 		defineAst(outputDir, "Stmt", Arrays.asList(
+				"Break      : Token token",
 				"Block      : List<Stmt> statements",
 				"Expression : Expr expression",
 				"Print      : Expr expression",
@@ -87,18 +88,20 @@ public class GenerateAST {
 		String[] fields = fieldList.split(", ");
 
 		// Fields
-		for (String field : fields) {
-			writer.println("		final " + field + ";");
-		}
-		writer.println();
+		if (!fields[0].isEmpty()) {
+			for (String field : fields) {
+				writer.println("		final " + field + ";");
+			}
+			writer.println();
 
-		// Constructor
-		writer.println("		" + className + "(" + fieldList + ") {");
-		for (String field : fields) { // Store parameters into the fields
-			String name = field.split(" ")[1];
-			writer.println("			this." + name + " = " + name + ";");
+			// Constructor
+			writer.println("		" + className + "(" + fieldList + ") {");
+			for (String field : fields) { // Store parameters into the fields
+				String name = field.split(" ")[1];
+				writer.println("			this." + name + " = " + name + ";");
+			}
+			writer.println("		}");
 		}
-		writer.println("		}");
 
 		// Visitor pattern functions
 		writer.println();
