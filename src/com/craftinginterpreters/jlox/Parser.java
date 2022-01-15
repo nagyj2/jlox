@@ -53,7 +53,7 @@ public class Parser {
 				return expr;
 			}
 
-			Expr center = conditional();
+			Expr center = equality();
 			consume(COLON, "Expected ':' after '?' true expression.");
 
 			if (!isPrimaryNext()) {

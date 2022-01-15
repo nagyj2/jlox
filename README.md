@@ -8,7 +8,7 @@ Below is the grammar for xlox up to this point:
 ```
 expression      -> conditional ( "," conditional )*
                  | conditional "," ;
-conditional     -> equality ( "?" equality ":" equality )* 
+conditional     -> equality ( "?" equality ":" conditional )* 
                  | equality "?" ":"
                  | equality "?" equality ":" ;
 equality        -> comparison ( ( "==" | "!=" ) comparison )*
