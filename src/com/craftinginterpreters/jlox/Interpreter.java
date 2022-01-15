@@ -43,15 +43,19 @@ public class Interpreter implements Expr.Visitor<Object>{
 
 			// Mathematical addition and string concatenation
 			case PLUS:
+				if (left instanceof String) {
+					return (String) left + stringify(right);
+				}
+
+				if (right instanceof String) {
+					return stringify(left) + (String) right;
+				}
+
 				if (left instanceof Double && right instanceof Double) {
 					return (double) left + (double) right;
 				}
-				
-				if (left instanceof String && right instanceof String) {
-					return (String) left + (String) right;
-				}
 
-				throw new RuntimeError(expr.operator, "Operands must either be 2 numbers or 2 strings.");
+				throw new RuntimeError(expr.operator, "Operands must either be 2 numbers or >=1 strings.");
 
 			case LESSER:
 			checkNumberOperands(expr.operator, left, right);
