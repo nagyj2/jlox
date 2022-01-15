@@ -22,6 +22,31 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 		return builder.toString();
 	}
 
+	@Override
+	public String visitIfStmt(Stmt.If stmt) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("(").append("if");
+		builder.append(print(stmt.thenBranch));
+		if (stmt.elseBranch != null) {
+			builder.append(" ");
+			builder.append(print(stmt.elseBranch));
+		}
+		builder.append(")");
+
+		return builder.toString();
+	}
+
+	@Override
+	public String visitWhileStmt(Stmt.While stmt) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("(").append("while");
+		builder.append(" ");
+		builder.append(print(stmt.body));
+		builder.append(")");
+
+		return builder.toString();
+	}
+
 	//~ Expressions
 
 	@Override
@@ -37,6 +62,7 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 	@Override
 	public String visitTernaryExpr(Expr.Ternary expr) {
 		return parenthesize(expr.operator.lexeme, expr.left, expr.center, expr.right);
+	}
 
 	@Override
 	public String visitLogicalExpr(Expr.Logical expr) {
