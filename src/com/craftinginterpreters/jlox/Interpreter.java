@@ -1,5 +1,7 @@
 package com.craftinginterpreters.jlox;
 
+import java.util.List;
+
 class RuntimeError extends RuntimeException {
 	final Token token;
 
@@ -9,21 +11,64 @@ class RuntimeError extends RuntimeException {
 	}
 }
 
-public class Interpreter implements Expr.Visitor<Object>{
-	
-	//* Starts the evaluation process.
-	private Object evaluate(Expr expr) {
-		return expr.accept(this);
-	}
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
-	public void interpret(Expr expression) {
+	private Environment environment = new Environment();
+	
+	//* Start the evaluation of a program.
+	public void interpret(List<Stmt> statements) {
 		try {
-			Object value = evaluate(expression);
-			System.out.println(stringify(value));
+			for (Stmt statement : statements) {
+				execute(statement);
+			}
 		} catch (RuntimeError error) {
 			Lox.runtimeError(error);
 		}
 	}
+	
+	//* Starts the expression evaluation process.
+	private Object evaluate(Expr expr) {
+		return expr.accept(this);
+	}
+
+	//* Starts the statement evaluation process.
+	private void execute(Stmt statement) {
+		statement.accept(this);
+	}
+
+	//~ Statement Evaluation
+
+	@Override
+	public Void visitExpressionStmt(Stmt.Expression stmt) {
+		evaluate(stmt.expression);
+		return null;
+	}
+
+	@Override
+	public Void visitPrintStmt(Stmt.Print stmt) {
+		Object value = evaluate(stmt.expression);
+		System.out.println(stringify(value));
+		return null;
+	}
+
+	@Override
+	public Void visitVarStmt(Stmt.Var stmt) {
+		Object value = null;
+		if (stmt.initializer != null) {
+			value = evaluate(stmt.initializer);
+		}
+
+		environment.define(stmt.name.lexeme, value);
+		return null;
+	}
+
+	@Override
+	public Void visitBlockStmt(Stmt.Block stmt) {
+		executeBlock(stmt.statements, new Environment(environment));
+		return null;
+	}
+
+	//~ Expression Evaluation
 
 	@Override
 	public Object visitBinaryExpr(Expr.Binary expr) {
@@ -104,8 +149,35 @@ public class Interpreter implements Expr.Visitor<Object>{
 
 		return null;
 	}
+
+	@Override
+	public Object visitVariableExpr(Expr.Variable expr) {
+		return environment.get(expr.name);
+	}
+
+	@Override
+	public Object visitAssignExpr(Expr.Assign expr) {
+		Object value = evaluate(expr.value);
+
+		environment.assign(expr.name, value);
+		return value;
+	}
 	
 	//~ Helper Functions
+
+	//* Evaluates all statements in a a block.
+	private void executeBlock(List<Stmt> statements, Environment environment) {
+		Environment previous = this.environment;
+		try {
+			this.environment = environment;
+
+			for (Stmt statement : statements) {
+				execute(statement);
+			}
+		} finally { // Use 'finally' so that if an exception is thrown, it still gets updated
+			this.environment = previous;
+		}
+	}
 
 	//* Implicitly converts any object to a boolean.
 	private boolean isTruthy(Object obj) {
@@ -150,7 +222,7 @@ public class Interpreter implements Expr.Visitor<Object>{
 				text = text.substring(0, text.length() - 2);
 			return text;
 		}
-		
+
 		return object.toString();
 	}
 	

@@ -5,9 +5,11 @@ import java.util.List;
 abstract class Expr {
 	interface Visitor<R> {
 		R visitBinaryExpr(Binary expr);
+		R visitUnaryExpr(Unary expr);
 		R visitGroupingExpr(Grouping expr);
 		R visitLiteralExpr(Literal expr);
-		R visitUnaryExpr(Unary expr);
+		R visitVariableExpr(Variable expr);
+		R visitAssignExpr(Assign expr);
 	}
 
 	static class Binary extends Expr {
@@ -24,6 +26,21 @@ abstract class Expr {
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitBinaryExpr(this);
+		}
+	}
+
+	static class Unary extends Expr {
+		final Token operator;
+		final Expr right;
+
+		Unary(Token operator, Expr right) {
+			this.operator = operator;
+			this.right = right;
+		}
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitUnaryExpr(this);
 		}
 	}
 
@@ -53,18 +70,31 @@ abstract class Expr {
 		}
 	}
 
-	static class Unary extends Expr {
-		final Token operator;
-		final Expr right;
+	static class Variable extends Expr {
+		final Token name;
 
-		Unary(Token operator, Expr right) {
-			this.operator = operator;
-			this.right = right;
+		Variable(Token name) {
+			this.name = name;
 		}
 
 		@Override
 		<R> R accept(Visitor<R> visitor) {
-			return visitor.visitUnaryExpr(this);
+			return visitor.visitVariableExpr(this);
+		}
+	}
+
+	static class Assign extends Expr {
+		final Token name;
+		final Expr value;
+
+		Assign(Token name, Expr value) {
+			this.name = name;
+			this.value = value;
+		}
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitAssignExpr(this);
 		}
 	}
 
