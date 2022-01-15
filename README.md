@@ -6,37 +6,6 @@ xlox (ecks-locks) is a small language based off the Lox language in the book 'Cr
 
 Below is the grammar for xlox up to this point:
 ```
-expression      -> conditional ( "," conditional )*
-                 | conditional "," ;
-conditional     -> equality ( "?" equality ":" conditional )* 
-                 | equality "?" ":"
-                 | equality "?" equality ":" ;
-equality        -> comparison ( ( "==" | "!=" ) comparison )*
-                 | comparison ( "==" | "!=" ) ;
-comparison      -> term ( ( ">" | ">=" | "<" | "<=" ) term )* 
-                 | term ( ">" | ">=" | "<" | "<=" ) ;
-term            -> factor ( ( "+" | "-" ) factor )*
-                 | factor ( "+" | "-" ) ;
-factor          -> unary ( ( "*" | "/" ) unary )* ;
-                 | unary ( "*" | "/" ) ;
-unary           -> ( "!" | "-" ) unary 
-                 | unary ;
-primary         -> NUMBER
-                 | STRING
-                 | "true" | "false" | "nil" ;
-                 | "(" expression ")"
-```
-
-### Modifications
-
-- Planned use of '<-' for inheritance
-- Comma expressions
-- Ternary operator
-
-### Grammar
-
-Below is the grammar for xlox up to this point:
-```
 program         -> declarations* EOF ;
 declarations    -> varDecl
                  | statement ;
@@ -47,9 +16,14 @@ statement       -> block
 block           -> "{" declarations* "}" ;
 printStmt       -> "print" expr ";" ;
 exprStmt        -> expression ";" ;
-expression      -> assignment ;
+expression      -> assignment ( "," assignment )*
+                 | assignment "," ;
 assignment      -> IDENTIFIER "=" assignment
-                 | equality ;
+                 | IDENTIFIER "="
+                 | conditional ;
+conditional     -> equality ( "?" equality ":" conditional )* 
+                 | equality "?" ":"
+                 | equality "?" equality ":" ;
 equality        -> comparison ( ( "==" | "!=" ) comparison )* ;
 comparison      -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term            -> factor ( ( "+" | "-" ) factor )* ;
@@ -62,6 +36,12 @@ primary         -> NUMBER
                  | "true" | "false" | "nil" ;
                  | "(" expression ")"
 ```
+
+### Modifications
+
+- Planned use of '<-' for inheritance
+- Comma expressions
+- Ternary operator
 
 ### Types
 
