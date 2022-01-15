@@ -20,14 +20,22 @@ public class Environment {
 	}
 
 	Object get(Token name) {
+		// note: disallows accessing nil variables. Uninitialized variables and nil SHOULD not be the same.
+		boolean errOnNil = false; // Should accessing a nil variable throw an error?
+
 		if (values.containsKey(name.lexeme)) {
-			return values.get(name.lexeme);
+			Object value = values.get(name.lexeme);
+
+			if (errOnNil && value == null)
+				throw new RuntimeError(name, "Uninitialized variable '" + name.lexeme + "'.");
+			
+			return value;
 		}
 
 		if (enclosing != null)
 			return enclosing.get(name);
 
-		throw new RuntimeError(null, "Undefined variable '" + name.lexeme + "'.");
+		throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
 	}
 
 	void assign(Token name, Object value) {
