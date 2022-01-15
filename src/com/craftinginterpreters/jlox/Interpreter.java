@@ -104,6 +104,27 @@ public class Interpreter implements Expr.Visitor<Object>{
 
 		return null;
 	}
+
+	@Override
+	public Object visitSequenceExpr(Expr.Sequence expr) {
+		// Object first = evaluate(expr.first); // According to the book, the first expression is discarded. Therefore, it is so here.
+		evaluate(expr.first);
+
+		Object second = evaluate(expr.second);
+
+		return second;
+	}
+
+	@Override
+	public Object visitTernaryExpr(Expr.Ternary expr) {
+		Object condition = evaluate(expr.left);
+
+		if (isTruthy(condition)) {
+			return evaluate(expr.center);
+		} else {
+			return evaluate(expr.right);
+		}
+	}
 	
 	//~ Helper Functions
 
