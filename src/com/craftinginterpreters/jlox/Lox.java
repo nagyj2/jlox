@@ -26,7 +26,7 @@ public class Lox {
 			// A file is supplied, so run it
 			runFile(args[0]);
 		} else {
-			// No file is supplied, so open up a prompt for input 
+			// No file is supplied, so open up a REPL session
 			runPrompt();
 		}
 	}
