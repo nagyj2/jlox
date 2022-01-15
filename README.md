@@ -7,11 +7,18 @@ xlox (ecks-locks) is a small language based off the Lox language in the book 'Cr
 Below is the grammar for xlox up to this point:
 ```
 expression      -> conditional ( "," conditional )*
-conditional     -> equality ( "?" equality ":" equality )* ;
-equality        -> comparison ( ( "==" | "!=" ) comparison )* ;
-comparison      -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-term            -> factor ( ( "+" | "-" ) factor )* ;
-factor          -> unary ( "*" | "/" ) factor ;
+                 | conditional "," ;
+conditional     -> equality ( "?" equality ":" equality )* 
+                 | equality "?" ":"
+                 | equality "?" equality ":" ;
+equality        -> comparison ( ( "==" | "!=" ) comparison )*
+                 | comparison ( "==" | "!=" ) ;
+comparison      -> term ( ( ">" | ">=" | "<" | "<=" ) term )* 
+                 | term ( ">" | ">=" | "<" | "<=" ) ;
+term            -> factor ( ( "+" | "-" ) factor )*
+                 | factor ( "+" | "-" ) ;
+factor          -> unary ( ( "*" | "/" ) unary )* ;
+                 | unary ( "*" | "/" ) ;
 unary           -> ( "!" | "-" ) unary 
                  | unary ;
 primary         -> NUMBER

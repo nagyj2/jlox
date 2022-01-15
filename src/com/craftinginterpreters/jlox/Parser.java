@@ -29,6 +29,11 @@ public class Parser {
 		Expr expr = conditional();
 
 		while (match(COMMA)) {
+			if (!isPrimaryNext()) {
+				error(isAtEnd() ? peek() : previous(), "Expected second operand.");
+				return expr;
+			}
+			
 			Expr right = conditional();
 			expr = new Expr.Sequence(expr, right);
 		}
@@ -42,8 +47,20 @@ public class Parser {
 
 		while (match(QUESTION)) {
 			Token operator = previous();
+
+			if (!isPrimaryNext()) {
+				error(isAtEnd() ? peek() : previous(), "Expected second operand.");
+				return expr;
+			}
+
 			Expr center = conditional();
 			consume(COLON, "Expected ':' after '?' true expression.");
+
+			if (!isPrimaryNext()) {
+				error(isAtEnd() ? peek() : previous(), "Expected third operand.");
+				return expr;
+			}
+
 			Expr right = conditional();
 			expr = new Expr.Ternary(operator, expr, center, right);
 		}
@@ -57,6 +74,12 @@ public class Parser {
 
 		while (match(BANG_EQUAL, EQUAL_EQUAL)) {
 			Token operator = previous();
+			
+			if (!isPrimaryNext()) {
+				error(isAtEnd() ? peek() : previous(), "Expected second operand.");
+				return expr;
+			}
+			
 			Expr right = comparison();
 			expr = new Expr.Binary(operator, expr, right);
 		}
@@ -70,6 +93,12 @@ public class Parser {
 
 		while (match(LESSER, GREATER, LESSER_EQUAL, GREATER_EQUAL)) {
 			Token operator = previous();
+
+			if (!isPrimaryNext()) {
+				error(isAtEnd() ? peek() : previous(), "Expected second operand.");
+				return expr;
+			}
+
 			Expr right = term();
 			expr = new Expr.Binary(operator, expr, right);
 		}
@@ -83,6 +112,12 @@ public class Parser {
 
 		while (match(MINUS, PLUS)) {
 			Token operator = previous();
+
+			if (!isPrimaryNext()) {
+				error(isAtEnd() ? peek() : previous(), "Expected second operand.");
+				return expr;
+			}
+
 			Expr right = factor();
 			expr = new Expr.Binary(operator, expr, right);
 		}
@@ -96,6 +131,12 @@ public class Parser {
 
 		while (match(STAR, SLASH)) {
 			Token operator = previous();
+
+			if (!isPrimaryNext()) {
+				error(isAtEnd() ? peek() : previous(), "Expected second operand.");
+				return expr;
+			}
+
 			Expr right = unary();
 			expr = new Expr.Binary(operator, expr, right);
 		}
@@ -147,6 +188,17 @@ public class Parser {
 		return false;
 	}
 
+	//* Looks at the current token and returns whether it matches a given token type
+	private boolean checks(TokenType... types) {
+		// Try to match the current token type against the given types.
+		for (TokenType type : types) {
+			if (check(type)) { // If there is a match, consume it and return true.
+				return true;
+			}
+		}
+		return false;
+	}
+
 	//* Checks if the current token matches the given token type. Does NOT consume the token.
 	private boolean check(TokenType type) {
 		if (isAtEnd()) // Never match the end of the token sequence.
@@ -190,6 +242,11 @@ public class Parser {
 	private ParseError error(Token token, String message) {
 		Lox.error(token, message);
 		return new ParseError();
+	}
+
+	//* Looks at the current token and returns whether it matches a start of a valid primary or unary.
+	private boolean isPrimaryNext() {
+		return checks(NUMBER, STRING, TRUE, FALSE, NIL, LEFT_PAREN, MINUS, BANG);
 	}
 
 	//* Synchronizes the parser state and token sequence.
