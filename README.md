@@ -11,9 +11,15 @@ declarations    -> varDecl
                  | statement ;
 varDecl         -> "var" IDENTIFIER ( "=" expression )? ";" ;
 statement       -> block
+                 | ifStmt
+                 | whileStmt
+                 | forStmt
                  | printStmt
                  | exprStmt ;
 block           -> "{" declarations* "}" ;
+ifStmt          -> "if" "(" expression ")" statement ( "else" statement )? ;
+whileStmt       -> "while" "(" expression ")" statement ;
+forStmt         -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
 printStmt       -> "print" expr ";" ;
 exprStmt        -> expression ";" ;
 expression      -> assignment ( "," assignment )*
@@ -21,9 +27,12 @@ expression      -> assignment ( "," assignment )*
 assignment      -> IDENTIFIER "=" assignment
                  | IDENTIFIER "="
                  | conditional ;
-conditional     -> equality ( "?" equality ":" conditional )* 
-                 | equality "?" ":"
-                 | equality "?" equality ":" ;
+conditional     -> logic_or ( "?" logic_or ":" conditional )* 
+                 | logic_or "?" ":"
+                 | logic_or "?" logic_or ":" ;
+                 | logic_or ;
+logic_or        -> logic_and ( "or" logic_and )* ;
+logic_and       -> equality ( "and" equality )* ;
 equality        -> comparison ( ( "==" | "!=" ) comparison )* ;
 comparison      -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term            -> factor ( ( "+" | "-" ) factor )* ;

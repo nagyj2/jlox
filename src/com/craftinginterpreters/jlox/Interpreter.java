@@ -41,6 +41,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	@Override
 	public Void visitExpressionStmt(Stmt.Expression stmt) {
 		evaluate(stmt.expression);
+		// if (isREPL)
+		// 	System.out.println(stringify(value));
 		return null;
 	}
 
@@ -65,6 +67,25 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	@Override
 	public Void visitBlockStmt(Stmt.Block stmt) {
 		executeBlock(stmt.statements, new Environment(environment));
+		return null;
+	}
+
+	@Override
+	public Void visitIfStmt(Stmt.If stmt) {
+		if (isTruthy(evaluate(stmt.condition))) {
+			execute(stmt.thenBranch);
+		} else if (stmt.elseBranch != null) {
+			execute(stmt.elseBranch);
+		}
+		return null;
+	}
+
+	@Override
+	public Void visitWhileStmt(Stmt.While stmt) {
+		while (isTruthy(evaluate(stmt.condition))) {
+			execute(stmt.body);
+		}
+		
 		return null;
 	}
 
@@ -105,16 +126,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 				throw new RuntimeError(expr.operator, "Operands must either be 2 numbers or >=1 strings.");
 
 			case LESSER:
-			checkNumberOperands(expr.operator, left, right);
+				checkNumberOperands(expr.operator, left, right);
 				return (double) left < (double) right;
 			case GREATER:
-			checkNumberOperands(expr.operator, left, right);
+				checkNumberOperands(expr.operator, left, right);
 				return (double) left > (double) right;
 			case LESSER_EQUAL:
-			checkNumberOperands(expr.operator, left, right);
+				checkNumberOperands(expr.operator, left, right);
 				return (double) left <= (double) right;
 			case GREATER_EQUAL:
-			checkNumberOperands(expr.operator, left, right);
+				checkNumberOperands(expr.operator, left, right);
 				return (double) left >= (double) right;
 
 			case EQUAL_EQUAL:
@@ -127,6 +148,22 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		}
 
 		return null;
+	}
+	
+	@Override
+	public Object visitLogicalExpr(Expr.Logical expr) {
+		// Implements short circuiting!
+		Object left = evaluate(expr.left);
+
+		if (expr.operator.type == TokenType.OR) {
+			if (isTruthy(left)) // b/c Lox is dynamically typed, look for truthiness and return that same truthiness.
+				return left; // If the entire expression can be determined, simply return it
+		} else { // AND
+			if (!isTruthy(left))
+				return left;
+		}
+
+		return evaluate(expr.right);
 	}
 	
 	@Override
