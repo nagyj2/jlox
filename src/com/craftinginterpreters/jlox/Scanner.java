@@ -168,7 +168,7 @@ public class Scanner {
 					
 				// Fallback on an unexpected char error.
 				} else {
-					Lox.error(line, "Unexpected character.");
+					Lox.error(line, "Unexpected character, '" + c + "'.");
 				}
 				
 				break;

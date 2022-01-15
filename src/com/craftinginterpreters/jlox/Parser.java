@@ -126,7 +126,7 @@ public class Parser {
 			return new Expr.Literal(previous().literal);
 		if (match(LEFT_PAREN)) {
 			Expr expr = expression();
-			consume(RIGHT_PAREN, "Expecte ')' after expression.");
+			consume(RIGHT_PAREN, "Expected ')' after expression.");
 			return new Expr.Grouping(expr);
 		}
 
