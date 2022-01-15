@@ -12,8 +12,11 @@ import java.util.List;
 
 public class Lox {
 
+    private static final Interpreter interpreter = new Interpreter();
+
     // Whether an error occured during execution.
     static boolean hadError = false;
+    static boolean hadRuntimeError = false;
 
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
@@ -28,28 +31,28 @@ public class Lox {
         }
     }
 
-    /**
-     * Executes a Lox file.
-     */
+    //~ Execution
+
+    //* Executes a Lox file.
     private static void runFile(String path) throws IOException {
         // Read the file
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         // Execute the file
         run(new String(bytes, Charset.defaultCharset()));
 
+        // Error codes
         if (hadError)
-            // Non-zero exit code.
             System.exit(65);
+        if (hadRuntimeError) // We care about runtime errors on files, but not REPL
+            System.exit(70);
     }
 
-    /**
-     * Opens a Lox interpreter in REPL mode.
-     */
+    //* Opens a Lox interpreter in REPL mode.
     private static void runPrompt() throws IOException {
         // Create object to capture input
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
-
+        
         for (;;) {
             System.out.print("> ");
             String line = reader.readLine();
@@ -71,17 +74,20 @@ public class Lox {
 
         if (hadError)
             return;
-        
-        System.out.println(new AstPrinter().print(expression));
+
+        // System.out.println(new AstPrinter().print(expression));
+        interpreter.interpret(expression);
 
     }
+    
+    //~ Error Handling
     
     //* Marks an error at a line with a message.
     static void error(int line, String message) {
         report(line, "", message);
     }
 
-    //* Marks an error at a line with a message.
+    //* Marks an error at a token with a message.
     static void error(Token token, String message) {
         if (token.type == TokenType.EOF)
             report(token.line, " at end", message);
@@ -89,9 +95,12 @@ public class Lox {
             report(token.line, "at '" + token.lexeme + "'", message);
     }
 
-    /**
-     * Reports an error to stderr with the line number, message and a position.
-     */
+    static void runtimeError(RuntimeError error) {
+        System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+        hadRuntimeError = true;
+    }
+
+    //* Reports an error to stderr with the line number, message and a position.
     private static void report(int line, String where, String message) {
         System.err.println("[line " + line + "] Error" + where + ": " + message);
         hadError = true;
