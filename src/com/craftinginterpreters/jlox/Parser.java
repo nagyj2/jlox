@@ -95,17 +95,17 @@ public class Parser {
 	private Expr expression() {
 		Expr expr = assignment();
 
-	while (match(COMMA)) {
-		if (!isPrimaryNext()) {
-			error(isAtEnd() ? peek() : previous(), "Expected second operand.");
-			return expr;
+		while (match(COMMA)) {
+			if (!isPrimaryNext()) {
+				error(isAtEnd() ? peek() : previous(), "Expected second operand.");
+				return expr;
+			}
+			
+			Expr right = assignment();
+			expr = new Expr.Sequence(expr, right);
 		}
-		
-		Expr right = assignment();
-		expr = new Expr.Sequence(expr, right);
-	}
 
-	return expr;
+		return expr;
 	}
 
 	//* Parse an assignment (=) expression.
@@ -114,6 +114,12 @@ public class Parser {
 
 		if (match(EQUAL)) {
 			Token equals = previous();
+
+			if (!isPrimaryNext()) {
+				error(isAtEnd() ? peek() : previous(), "Expected r-value.");
+				return expr;
+			}
+
 			// b/c assignment is right associative, call this level recursively
 			Expr value = assignment();
 
@@ -336,7 +342,7 @@ public class Parser {
 
 	//* Looks at the current token and returns whether it matches a start of a valid primary or unary.
 	private boolean isPrimaryNext() {
-		return checks(NUMBER, STRING, TRUE, FALSE, NIL, LEFT_PAREN, MINUS, BANG);
+		return checks(NUMBER, STRING, IDENTIFIER, TRUE, FALSE, NIL, LEFT_PAREN, MINUS, BANG);
 	}
 
 	//* Synchronizes the parser state and token sequence.
