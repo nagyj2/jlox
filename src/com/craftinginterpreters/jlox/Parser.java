@@ -181,12 +181,13 @@ public class Parser {
 		Stmt body = statement();
 
 		Expr condition;
-		
+
 		if (match(WHILE)) {
 			consume(LEFT_PAREN, "Expected '(' after 'while'.");
 			condition = expression();
 			consume(RIGHT_PAREN, "Expected ')' after condition.");
-			consume(SEMICOLON, "Expected ')' after condition.");
+			
+			REPLSemicolon();
 		} else {
 			condition = null;
 		}
