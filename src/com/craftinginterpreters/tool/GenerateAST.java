@@ -31,6 +31,7 @@ public class GenerateAST {
 		// Create statement nodes
 		defineAst(outputDir, "Stmt", Arrays.asList(
 				"Break      : Token token",
+				"Do         : Stmt body, Expr condition",
 				"Block      : List<Stmt> statements",
 				"Expression : Expr expression",
 				"Print      : Expr expression",

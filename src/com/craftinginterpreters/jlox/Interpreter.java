@@ -97,10 +97,25 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			while (isTruthy(evaluate(stmt.condition))) {
 				execute(stmt.body);
 			}
+		} catch (StopIteration error) {
+			return null;
+		}
+		return null;
+	}
+
+	@Override
+	public Void visitDoStmt(Stmt.Do stmt) {
+		try {
+			if (stmt.condition == null) {
+				execute(stmt.body);
+			} else {
+				do {
+					execute(stmt.body);
+				} while (isTruthy(evaluate(stmt.condition)));
+			}
 
 		} catch (StopIteration error) {
 			return null;
-
 		}
 
 		return null;
@@ -228,6 +243,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		return value;
 	}
 	
+	@Override
 	public Object visitSequenceExpr(Expr.Sequence expr) {
 		// Object first = evaluate(expr.first); // According to the book, the first expression is discarded. Therefore, it is so here.
 		evaluate(expr.first);

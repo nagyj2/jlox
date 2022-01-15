@@ -36,6 +36,7 @@ enum TokenType {
 	AND,
 	BREAK,
 	CLASS,
+	DO,
 	ELSE,
 	FALSE,
 	FOR,

@@ -25,6 +25,7 @@ public class Scanner {
 		keywords.put("and", 		AND);
 		keywords.put("break", 	BREAK);
 		keywords.put("class", 	CLASS);
+		keywords.put("do", 	DO);
 		keywords.put("else", 		ELSE);
 		keywords.put("false", 	FALSE);
 		keywords.put("for", 		FOR);

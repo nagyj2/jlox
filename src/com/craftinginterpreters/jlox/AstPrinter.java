@@ -48,6 +48,19 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 	}
 
 	@Override
+	public String visitDoStmt(Stmt.Do stmt) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("(").append("do");
+		builder.append(" ");
+		builder.append(print(stmt.body));
+		builder.append(" ");
+		builder.append(print(stmt.condition));
+		builder.append(")");
+
+		return builder.toString();
+	}
+
+	@Override
 	public String visitBreakStmt(Stmt.Break stmt) {
 		return "break";
 	}

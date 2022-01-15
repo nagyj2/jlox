@@ -52,8 +52,7 @@ public class Parser {
 			initializer = expression();
 		}
 
-		if (!isREPL || !isAtEnd())
-			consume(SEMICOLON, "Expected ';' after variable declaration.");
+		REPLSemicolon();
 		
 		return new Stmt.Var(name, initializer);
 	}
@@ -71,6 +70,9 @@ public class Parser {
 		}
 		if (match(FOR)) {
 			return forStatement();
+		}
+		if (match(DO)) {
+			return doStatement();
 		}
 		if (match(PRINT)) {
 			return printStatement();
@@ -173,13 +175,31 @@ public class Parser {
 		return body;
 
 	}
-	
-	private Stmt breakStatement() {
 
+	//* Parses a do-while statement.
+	private Stmt doStatement() {
+		Stmt body = statement();
+
+		Expr condition;
+		
+		if (match(WHILE)) {
+			consume(LEFT_PAREN, "Expected '(' after 'while'.");
+			condition = expression();
+			consume(RIGHT_PAREN, "Expected ')' after condition.");
+			consume(SEMICOLON, "Expected ')' after condition.");
+		} else {
+			condition = null;
+		}
+
+		return new Stmt.Do(body, condition);
+
+	}
+
+	//* Parses a break statement.
+	private Stmt breakStatement() {
 		Token _break = previous();
 		
-		if (!isREPL || !isAtEnd())
-			consume(SEMICOLON, "Expected ';' after expression.");
+		REPLSemicolon();
 
 		return new Stmt.Break(_break);
 	}
@@ -188,8 +208,7 @@ public class Parser {
 	private Stmt printStatement() {
 		Expr value = expression();
 
-		if (!isREPL || !isAtEnd())
-			consume(SEMICOLON, "Expected ';' after expression.");
+		REPLSemicolon();
 	
 		return new Stmt.Print(value);
 	}
@@ -199,8 +218,7 @@ public class Parser {
 		Expr expr = expression();
 
 		// If in REPL mode and at the end, the ';' is optional
-		if (!isREPL || !isAtEnd())
-			consume(SEMICOLON, "Expected ';' after expression.");
+		REPLSemicolon();
 		
 		return new Stmt.Expression(expr);
 	}
@@ -490,6 +508,13 @@ public class Parser {
 	private ParseError error(Token token, String message) {
 		Lox.error(token, message);
 		return new ParseError();
+	}
+
+	//* Requires a semicolon if NOT in REPL mode.
+	private void REPLSemicolon(){
+		if (!isREPL || !isAtEnd())
+			consume(SEMICOLON, "Expected ';' after variable declaration.");
+
 	}
 
 	//* Looks at the current token and returns whether it matches a start of a valid primary or unary.
