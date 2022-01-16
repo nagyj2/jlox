@@ -317,12 +317,30 @@ nestedPrint()(1,2);
 
 // Constants
 
-let a = 1;
-print "Constant a = " + a;
+let CC = 1;
+print "Constant CC = " + CC;
 // a = 2; //< Error!
 // var a = 3; // <Error!
 
-var va = a + a; // const is not carried
+var va = CC + CC; // const is not carried
 va = va + 2;
+
+let max = fun (a, b) {
+	if (a > b) return a;
+	return b;
+};
+
+print max(66,33);
+
+var a = "global";
+{
+	fun showA() {
+		print a;
+	}
+
+	showA();
+	a = "local";
+	showA();
+}
 
 print "Completed sample.xlox!";
