@@ -26,6 +26,14 @@
 		},
 		{
 			"type": "java",
+			"name": "Run Lox Source",
+			"request": "launch",
+			"mainClass": "com.craftinginterpreters.jlox.Lox",
+			"projectName": "jlox_52d37a56",
+			"args": ["sample.lox"]
+		},
+		{
+			"type": "java",
 			"name": "Generate AST",
 			"request": "launch",
 			"mainClass": "com.craftinginterpreters.tool.GenerateAST",
