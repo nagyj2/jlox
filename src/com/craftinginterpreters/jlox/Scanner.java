@@ -135,19 +135,7 @@ public class Scanner {
 						advance();
 
 				} else if (match('*')) {
-					// A block comment. Skip until end of line.
-					while (!(peek() == '*' && peekNext() == '/') && !isAtEnd()) {
-						if (peek() == '\n')
-							line++;
-						advance();
-					}
-
-					if (current + 1 >= source.length()) {
-						Lox.error(line, "Unterminated block comment.");
-					} else {
-						advance(); // Skip the '*/'
-						advance();
-					}
+					blockComment();
 
 				} else {
 					addToken(SLASH);
@@ -282,6 +270,23 @@ public class Scanner {
 			type = IDENTIFIER;
 
 		addToken(type);
+	}
+
+	//* Parses a block comment
+	private void blockComment() {
+		// A block comment. Skip until end of line.
+		while (!(peek() == '*' && peekNext() == '/') && !isAtEnd()) {
+			if (peek() == '\n')
+				line++;
+			advance();
+		}
+
+		if (current + 1 >= source.length()) {
+			Lox.error(line, "Unterminated block comment.");
+		} else {
+			advance(); // Skip the '*/'
+			advance();
+		}
 	}
 
 	//~ Character and Position Checkers
