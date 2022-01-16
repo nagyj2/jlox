@@ -26,11 +26,11 @@
 		},
 		{
 			"type": "java",
-			"name": "Run Lox Source",
+			"name": "Run xLox Source",
 			"request": "launch",
 			"mainClass": "com.craftinginterpreters.jlox.Lox",
 			"projectName": "jlox_52d37a56",
-			"args": ["sample.lox"]
+			"args": ["sample.xlox"]
 		},
 		{
 			"type": "java",
