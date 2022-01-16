@@ -42,6 +42,7 @@ enum TokenType {
 	FOR,
 	FUNC,
 	IF,
+	LET,
 	NIL,
 	OR,
 	PRINT,

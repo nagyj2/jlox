@@ -315,4 +315,14 @@ fun nestedPrint() {
 
 nestedPrint()(1,2);
 
+// Constants
+
+let a = 1;
+print "Constant a = " + a;
+// a = 2; //< Error!
+// var a = 3; // <Error!
+
+var va = a + a; // const is not carried
+va = va + 2;
+
 print "Completed sample.xlox!";

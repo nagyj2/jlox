@@ -8,9 +8,11 @@ Below is the grammar for xlox up to this point:
 ```
 program         -> declarations* EOF ;
 declarations    -> varDecl
+                 | letDecl
                  | funDecl
                  | statement ;
 varDecl         -> "var" IDENTIFIER ( "=" assignment )? ( "," IDENTIFIER ( "=" assignment )? )* ";" ;
+letDecl         -> "let" IDENTIFIER "=" assignment ( "," IDENTIFIER "=" assignment )* ";" ;
 funDecl         -> "fun" function;
 function        -> IDENTIFIER "(" parameters? ")" block ;
 statement       -> block
@@ -60,8 +62,8 @@ call            -> primary ( "(" arguments? ")" )* ;
 primary         -> NUMBER
                  | STRING
                  | IDENTIFIER
-                 | "true" | "false" | "nil" ;
-                 | "(" expression ")"
+                 | "true" | "false" | "nil"
+                 | "(" expression ")" ; 
 parameters      -> IDENTIFIER ( "," IDENTIFIER )* ;
 arguments       -> assignment ( "," assignment )* ;
 ```
@@ -79,6 +81,9 @@ arguments       -> assignment ( "," assignment )* ;
   - `do` statements allow for `break` statements
 - Lambda functions
 - Multiple variable declaration within `var` using `,`
+- Constant declarations
+  - func statements are **NOT** constants
+  - parameters are **NOT** constants 
 
 #### Desired Modifications
 

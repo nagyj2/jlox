@@ -30,7 +30,8 @@ public class Scanner {
 		keywords.put("false", 	FALSE);
 		keywords.put("for", 		FOR);
 		keywords.put("fun", 		FUNC);
-		keywords.put("if", 			IF);
+		keywords.put("if",      IF);
+		keywords.put("let",     LET);
 		keywords.put("nil", 		NIL);
 		keywords.put("or", 			OR);
 		keywords.put("print", 	PRINT);

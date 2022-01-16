@@ -34,6 +34,8 @@ public class Parser {
 		try {
 			if (match(VAR))
 				return varDeclaration();
+			if (match(LET))
+				return letDeclaration();
 			if (check(FUNC) && checkNext(IDENTIFIER)) {
 				match(FUNC);
 				return funDeclaration();
@@ -49,7 +51,15 @@ public class Parser {
 	
 	//* Parse a variable declaration. Note that the 'var' was consumed by the declaration() method.
 	private Stmt varDeclaration() {
-
+		return newDeclaration(false);
+	}
+	//* Parse a constant declaration. Note that the 'let' was consumed by the declaration() method.
+	private Stmt letDeclaration() {
+		return newDeclaration(true);
+	}
+	
+	//* Parse a new variable-like declaration.
+	private Stmt newDeclaration(boolean constant) {
 		Stmt stmt = null;
 		do {
 			Token name = consume(IDENTIFIER, "Expected variable name.");
@@ -59,7 +69,7 @@ public class Parser {
 				initializer = commaless();
 			}
 
-			stmt = new Stmt.Var(name, initializer, stmt);
+			stmt = new Stmt.Var(name, initializer, constant, stmt);
 		} while (match(COMMA));
 
 		REPLSemicolon();
@@ -173,6 +183,8 @@ public class Parser {
 			initializer = null;
 		} else if (match(VAR)) {
 			initializer = varDeclaration();
+		} else if (match(LET)) {
+			initializer = letDeclaration();
 		} else {
 			initializer = expressionStatement();
 		}

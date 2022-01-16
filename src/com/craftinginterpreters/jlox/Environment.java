@@ -4,8 +4,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Environment {
+	private class Entry {
+		public Object content;
+		public final boolean constant;
+	
+		public Entry(Object content, boolean constant) {
+			this.content = content;
+			this.constant = constant;
+		}
+
+		public void change(Object content) {
+			if (!constant)
+				this.content = content;
+		}
+	}
+
 	final Environment enclosing;
-	private final Map<String, Object> values = new HashMap<>();
+	private final Map<String, Entry > values = new HashMap<>();
 
 	Environment() {
 		this.enclosing = null;
@@ -15,8 +30,19 @@ public class Environment {
 		this.enclosing = env;
 	}
 
-	void define(String name, Object value) {
-		values.put(name, value);
+	void define(Token token, boolean constant, Object value) {
+		if (values.containsKey(token.lexeme) && values.get(token.lexeme).constant) {
+			throw new RuntimeError(token, "Cannot redefine constant.");
+		}
+
+		Entry entry = new Entry(value, constant);
+		values.put(token.lexeme, entry);
+	}
+
+	void define(String name, boolean constant, Object value) {
+
+		Entry entry = new Entry(value, constant);
+		values.put(name, entry);
 	}
 
 	Object get(Token name) {
@@ -24,12 +50,12 @@ public class Environment {
 		boolean errOnNil = false; // Should accessing a nil variable throw an error?
 
 		if (values.containsKey(name.lexeme)) {
-			Object value = values.get(name.lexeme);
+			Entry value = values.get(name.lexeme);
 
 			if (errOnNil && value == null)
 				throw new RuntimeError(name, "Uninitialized variable '" + name.lexeme + "'.");
 			
-			return value;
+			return value.content;
 		}
 
 		if (enclosing != null)
@@ -40,7 +66,13 @@ public class Environment {
 
 	void assign(Token name, Object value) {
 		if (values.containsKey(name.lexeme)) {
-			values.put(name.lexeme, value);
+			Entry entry = values.get(name.lexeme);
+
+			if (entry.constant){
+				throw new RuntimeError(name, "Cannot redefine constant");
+			}
+
+			entry.change(value);
 			return;
 		}
 

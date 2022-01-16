@@ -38,7 +38,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 	Interpreter() {
 		// Create a native function with a Java anonymous class
-		globals.define("clock", new LoxCallable() {
+		globals.define("clock", true, new LoxCallable() {
 			@Override
 			public int arity() { return 0; }
 
@@ -96,7 +96,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			value = evaluate(stmt.initializer);
 		}
 
-		environment.define(stmt.name.lexeme, value);
+		environment.define(stmt.name, stmt.constant, value);
 		if (stmt.next != null)
 			visitVarStmt((Stmt.Var) stmt.next);
 		return null;
@@ -134,7 +134,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	@Override
 	public Void visitFunctionStmt(Stmt.Function stmt) {
 		LoxFunction function = new LoxFunction(stmt, environment); // Save the environment which declares the function, not calls
-		environment.define(stmt.name.lexeme, function);
+		environment.define(stmt.name, false, function);
 		return null;
 	}
 
