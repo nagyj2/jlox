@@ -77,6 +77,18 @@ arguments       -> assignment ( "," assignment )* ;
 - `break` statement
 - `do` statement and `do-while` loops
   - `do` statements allow for `break` statements
+- Lambda functions
+
+#### Desired Modifications
+
+- Module system
+- Standard Library
+  - xlox Implemented
+  - Native Functions to extend xlox capability (Java implemented)
+  - Foreign Function Interface?
+- Everything is a class
+- Classes can integrated into syntax
+  - Customizable syntax?
 
 ### Types
 
