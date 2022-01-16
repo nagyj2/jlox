@@ -8,13 +8,17 @@ Below is the grammar for xlox up to this point:
 ```
 program         -> declarations* EOF ;
 declarations    -> varDecl
+                 | funDecl
                  | statement ;
 varDecl         -> "var" IDENTIFIER ( "=" expression )? ";" ;
+funDecl         -> "fun" function;
+function        -> IDENTIFIER "(" parameters? ")" block ;
 statement       -> block
                  | ifStmt
                  | whileStmt
                  | forStmt
                  | printStmt
+                 | returnStmt
                  | exprStmt ;
 block           -> "{" declarations* "}" ;
 ifStmt          -> "if" "(" expression ")" statement ( "else" statement )? ;
@@ -22,6 +26,7 @@ whileStmt       -> "while" "(" expression ")" statement ;
 forStmt         -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
 printStmt       -> "print" expr ";" ;
 exprStmt        -> expression ";" ;
+returnStmt      -> "return expression? ";" ;
 expression      -> assignment ;
 assignment      -> IDENTIFIER "=" assignment
                  | logic_or ;
@@ -32,12 +37,15 @@ comparison      -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term            -> factor ( ( "+" | "-" ) factor )* ;
 factor          -> unary ( ( "*" | "/" ) unary )* ;
 unary           -> ( "!" | "-" ) unary 
-                 | unary ;
+                 | call ;
+call            -> primary ( "(" arguments? ")" )* ;                 
 primary         -> NUMBER
                  | STRING
                  | IDENTIFIER
                  | "true" | "false" | "nil" ;
                  | "(" expression ")"
+parameters      -> IDENTIFIER ( "," IDENTIFIER )* ;
+arguments       -> expression ( "," expression )* ;
 ```
 
 ### Types

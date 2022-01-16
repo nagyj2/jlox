@@ -31,6 +31,8 @@ public class Parser {
 		try {
 			if (match(VAR))
 				return varDeclaration();
+			if (match(FUNC))
+				return funDeclaration();
 
 			return statement();
 
@@ -53,6 +55,34 @@ public class Parser {
 		return new Stmt.Var(name, initializer);
 	}
 
+	//* Parse a function declaration.
+	private Stmt funDeclaration() {
+		return function("function"); // Want a function to be made, so specify
+	}
+
+	//* Parse a function declaration. Takes a string so that the code can be reused and the errors still make sense.
+	private Stmt function(String kind) {
+		Token name = consume(IDENTIFIER, "Expected " + kind + " name.");
+
+		consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
+		List<Token> parameters = new ArrayList<>();
+		if (!check(RIGHT_PAREN)) {
+			do {
+				if (parameters.size() >= 255) {
+					error(peek(), "Cannot have more than 255 parameters.");
+				}
+
+				parameters.add(consume(IDENTIFIER, "Expected parameter name."));
+			} while (match(COMMA));
+		}
+		consume(RIGHT_PAREN, "Expected ')' after parameters.");
+
+		consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
+		List<Stmt> body = block();
+
+		return new Stmt.Function(name, parameters, body);
+	}
+
 	//* Parse a statement.
 	private Stmt statement() {
 		if (match(LEFT_BRACE)) {
@@ -69,6 +99,9 @@ public class Parser {
 		}
 		if (match(PRINT)) {
 			return printStatement();
+		}
+		if (match(RETURN)) {
+			return returnStatement();
 		}
 
 		return expressionStatement();
@@ -205,6 +238,18 @@ public class Parser {
 		return expr;
 	}
 
+	//* Parses a return statement.
+	private Stmt returnStatement() {
+		Token keyword = previous();
+		Expr value = null;
+		if (!check(SEMICOLON)) {
+			value = expression();
+		}
+
+		consume(SEMICOLON, "Expected ';' after return value.");
+		return new Stmt.Return(keyword, value);
+	}
+
 	//* Parses a logical OR expression.
 	private Expr logical_or() {
 		Expr expr = logical_and();
@@ -291,7 +336,38 @@ public class Parser {
 			return new Expr.Unary(operator, right);
 		}
 
-		return primary();
+		return call();
+	}
+
+	//* Parse a call expression.
+	private Expr call() {
+		Expr expr = primary();
+
+		while (true) {
+			if (match(LEFT_PAREN)) {
+				expr = finishCall(expr); // The newly created call expression (expr) becomes the next callee. Allows for 'func()()' shapes
+			} else {
+				break;
+			}
+		}
+
+		return expr;
+	}
+
+	private Expr finishCall(Expr callee) {
+		List<Expr> arguments = new ArrayList<>();
+		if (!check(RIGHT_PAREN)) { // Handle no argument case
+			do {
+				if (arguments.size() >= 255) {
+					// _reports_, not _throws_, an error. The parser state isn't invalid, but a warning should be shown.'
+					error(peek(), "Cannot have more than 255 arguments.");
+				}
+				arguments.add(expression());
+			} while (match(COMMA));
+		}
+
+		Token paren = consume(RIGHT_PAREN, "Expected ')' after arguments.");
+		return new Expr.Call(callee, paren, arguments);
 	}
 
 	//* Parse a primary/ literal expression.
