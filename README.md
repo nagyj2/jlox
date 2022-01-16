@@ -96,6 +96,7 @@ arguments       -> assignment ( "," assignment )* ;
 - Classes can integrated into syntax
   - Customizable syntax?
 - Syntax for final functions and parameters
+- Nestable block comments
 
 ### Types
 
