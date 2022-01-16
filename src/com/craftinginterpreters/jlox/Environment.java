@@ -22,10 +22,12 @@ public class Environment {
 	final Environment enclosing;
 	private final Map<String, Entry > values = new HashMap<>();
 
+	//* Used for the global environment. There is no enclosing environment.
 	Environment() {
 		this.enclosing = null;
 	}
 
+	//* Used for the local environments.
 	Environment(Environment env) {
 		this.enclosing = env;
 	}
@@ -45,25 +47,18 @@ public class Environment {
 		values.put(name, entry);
 	}
 
+
+	//* Looks up a variable in the current environment. If it does not exist, a runtime error is thrown. Used for global env.
 	Object get(Token name) {
-		// note: disallows accessing nil variables. Uninitialized variables and nil SHOULD not be the same.
-		boolean errOnNil = false; // Should accessing a nil variable throw an error?
-
-		if (values.containsKey(name.lexeme)) {
-			Entry value = values.get(name.lexeme);
-
-			if (errOnNil && value == null)
-				throw new RuntimeError(name, "Uninitialized variable '" + name.lexeme + "'.");
-			
-			return value.content;
-		}
-
-		if (enclosing != null)
-			return enclosing.get(name);
-
-		throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+		return retrieve(name).content;
 	}
 
+	//* Returns a variable at a specific distance from the current environment.
+	Object getAt(int distance, String name) {
+		return ancestor(distance).values.get(name).content;
+	}
+
+	//* Assigns a value to a variable in the current environment. If it doesn't exist, a runtime error is thrown. Used for global env.
 	void assign(Token name, Object value) {
 		if (values.containsKey(name.lexeme)) {
 			Entry entry = values.get(name.lexeme);
@@ -82,5 +77,43 @@ public class Environment {
 		}
 
 		throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+	}
+
+	//* Assigns a value to a specific variable identified by a name and number of environments to skip.
+	void assignAt(int distance, Token token, Object value) {
+		Entry entry = ancestor(distance).retrieve(token);
+		if (entry.constant) {
+			throw new RuntimeError(token, "Cannot redefine constant");
+		}
+
+		entry.change(value);
+	}
+
+	//* Returns an environment that is a specific distance away from the current environment.
+	Environment ancestor(int distance) {
+		Environment env = this;
+		for (int i = 0; i < distance; i++)
+			env = env.enclosing;
+
+		return env;
+	}
+
+	private Entry retrieve(Token token) {
+		// note: disallows accessing nil variables. Uninitialized variables and nil SHOULD not be the same.
+		boolean errOnNil = false; // Should accessing a nil variable throw an error?
+
+		if (values.containsKey(token.lexeme)) {
+			Entry value = values.get(token.lexeme);
+
+			if (errOnNil && value == null)
+				throw new RuntimeError(token, "Uninitialized variable '" + token.lexeme + "'.");
+			
+			return value;
+		}
+
+		if (enclosing != null)
+			return enclosing.retrieve(token);
+
+		throw new RuntimeError(token, "Undefined variable '" + token.lexeme + "'.");
 	}
 }

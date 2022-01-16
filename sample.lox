@@ -145,4 +145,26 @@ for (var i = 0; i < 10; i = i + 1) {
 	print fib(i);
 }
 
+var a = "outer";
+{
+	fun showA(){
+		print a;
+	}
+
+	showA(); // "outer"
+	var a = "inner";
+	showA(); // "outer"
+}
+
+var a = "outer";
+{
+	fun showA(){
+		print a;
+	}
+
+	showA(); // "outer"
+	a = "inner"; // not declaring a new var, so this is a reassignment of global 'a'
+	showA(); // "inner"
+}
+
 print "Completed sample.lox!";

@@ -1,40 +1,17 @@
 package com.craftinginterpreters.jlox;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-class RuntimeError extends RuntimeException {
-	final Token token;
-
-	public RuntimeError(Token token, String message) {
-		super(message);
-		this.token = token;
-	}
-}
-
-class Break extends RuntimeException {
-	final Token token;
-
-	public Break(Token token) {
-		super(null, null, false, false); // Used for control flow, so lighten the overhead
-		this.token = token;
-	}
-}
-
-class Return extends RuntimeException {
-	final Object value;
-
-	public Return(Object value) {
-		super(null, null, false, false);
-		this.value = value;
-	}
-}
+import java.util.Map;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	//* Top level environment. Stays fixed for the interpreter.
 	final Environment globals = new Environment();
 	//* Current environment for the interpreter. Starts with the global environment.
 	private Environment environment = globals;
+	//* Associates an AST node with the results of the resolver (how many environments to peel back to find the variable)
+	private final Map<Expr, Integer> locals = new HashMap<>();
 
 	Interpreter() {
 		// Create a native function with a Java anonymous class
@@ -70,6 +47,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	//* Starts the statement evaluation process.
 	private void execute(Stmt statement) {
 		statement.accept(this);
+	}
+
+	//* Tells the interpreter how many environments to skip to get to the desired variable.
+	void resolve(Expr expr, int depth) {
+		locals.put(expr, depth);
 	}
 
 	//~ Statement Evaluation
@@ -277,14 +259,20 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 	@Override
 	public Object visitVariableExpr(Expr.Variable expr) {
-		return environment.get(expr.name);
+		// return environment.get(expr.name);
+		return lookUpVariable(expr.name, expr);
 	}
 
 	@Override
 	public Object visitAssignExpr(Expr.Assign expr) {
 		Object value = evaluate(expr.value);
 
-		environment.assign(expr.name, value);
+		Integer distance = locals.get(expr);
+		if (distance != null) {
+			environment.assignAt(distance, expr.name, value);
+		} else {
+			globals.assign(expr.name, value);
+		}
 		return value;
 	}
 
@@ -352,6 +340,17 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			}
 		} finally { // Use 'finally' so that if an exception is thrown, it still gets updated
 			this.environment = previous;
+		}
+	}
+
+	//* Looks up a variable in the environemnt. Recieves delegations where the number of environments to skip is specified.
+	private Object lookUpVariable(Token name, Expr expr) {
+		// Get resolver distance information
+		Integer distance = locals.get(expr);
+		if (distance != null) {
+			return environment.getAt(distance, name.lexeme);
+		} else { // If no distance info, we assumed global scope, so look there
+			return globals.get(name);
 		}
 	}
 
