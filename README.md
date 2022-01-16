@@ -78,6 +78,7 @@ arguments       -> assignment ( "," assignment )* ;
 - `do` statement and `do-while` loops
   - `do` statements allow for `break` statements
 - Lambda functions
+- Multiple variable declaration within `var` using `,`
 
 #### Desired Modifications
 
