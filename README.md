@@ -95,6 +95,7 @@ arguments       -> assignment ( "," assignment )* ;
 - Everything is a class
 - Classes can integrated into syntax
   - Customizable syntax?
+- Syntax for final functions and parameters
 
 ### Types
 
