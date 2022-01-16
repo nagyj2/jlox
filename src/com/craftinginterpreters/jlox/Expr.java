@@ -13,6 +13,7 @@ abstract class Expr {
 		R visitSequenceExpr(Sequence expr);
 		R visitTernaryExpr(Ternary expr);
 		R visitLogicalExpr(Logical expr);
+		R visitLambdaExpr(Lambda expr);
 		R visitCallExpr(Call expr);
 	}
 
@@ -150,6 +151,23 @@ abstract class Expr {
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitLogicalExpr(this);
+		}
+	}
+
+	static class Lambda extends Expr {
+		final Token close;
+		final List<Token> params;
+		final List<Stmt> body;
+
+		Lambda(Token close, List<Token> params, List<Stmt> body) {
+			this.close = close;
+			this.params = params;
+			this.body = body;
+		}
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitLambdaExpr(this);
 		}
 	}
 

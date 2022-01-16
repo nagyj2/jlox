@@ -254,4 +254,42 @@ do {
 } while (i > 0);
 print "i = " + i;
 
+// Anonymous Functions
+
+var max = fun (a, b) {
+	if (a > b) return a;
+	return b;
+}; 
+print "max(3,8) = " + max(3,8);
+
+fun max (a, b) {
+	if (a > b) return a;
+	return b;
+}
+print "max(8,3) = " + max(8,3);
+
+fun thrice(ft){
+	for (var i = 0; i < 3; i = i + 1) 
+		ft(i);
+}
+
+thrice(fun (a) { print a; });
+
+fun () {}; // anonymous function which looks like a function declaration
+
+var xx; var xy; var xz;
+xx = fun () {print "xx";}, xy = fun () {print "xy";};
+xz = fun () {print "xz";};
+
+xx(); xy(); xz();
+
+fun nestedPrint() {
+	return fun (a,b) {
+		print "n" + a;
+		print "n" + b;
+	};
+}
+
+nestedPrint()(1,2);
+
 print "Completed sample.xlox!";

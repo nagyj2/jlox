@@ -35,6 +35,8 @@ expression      -> assignment ( "," assignment )*
                  | assignment "," ;
 assignment      -> IDENTIFIER "=" assignment
                  | IDENTIFIER "="
+                 | functional ;
+functional      -> "fun" "(" parameters? ")" block
                  | conditional ;
 conditional     -> logic_or ( "?" logic_or ":" conditional )* 
                  | logic_or "?" ":"

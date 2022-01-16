@@ -311,6 +311,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	}
 	
 	@Override
+	public Object visitLambdaExpr(Expr.Lambda expr) {
+		LoxFunction function = new LoxFunction(new Stmt.Function(null, expr.params, expr.body), environment); // Save the environment which declares the function, not calls
+		return function;
+	}
+
+	@Override
 	public Object visitSequenceExpr(Expr.Sequence expr) {
 		// Object first = evaluate(expr.first); // According to the book, the first expression is discarded. Therefore, it is so here.
 		evaluate(expr.first);

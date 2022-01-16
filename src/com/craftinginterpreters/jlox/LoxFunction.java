@@ -39,6 +39,8 @@ public class LoxFunction implements LoxCallable {
 	@Override
 	// B/c This LoxFunction is passed around internally as an Object, if we print it in our lang, sysout will call toString() on it. Might as well implement it...
 	public String toString() {
+		if (declaration == null)
+			return "<fn>";
 		return "<fn " + declaration.name.lexeme +">";
 	}
 }

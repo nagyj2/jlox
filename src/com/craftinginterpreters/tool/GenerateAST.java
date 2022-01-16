@@ -26,6 +26,7 @@ public class GenerateAST {
 				"Sequence : Expr first, Expr second",
 				"Ternary  : Token operator, Expr left, Expr center, Expr right",
 				"Logical  : Token operator, Expr left, Expr right",
+				"Lambda   : Token close, List<Token> params, List<Stmt> body",
 				"Call     : Expr callee, Token paren, List<Expr> arguments"
 		));
 

@@ -34,8 +34,10 @@ public class Parser {
 		try {
 			if (match(VAR))
 				return varDeclaration();
-			if (match(FUNC))
+			if (check(FUNC) && checkNext(IDENTIFIER)) {
+				match(FUNC);
 				return funDeclaration();
+			}
 
 			return statement();
 
@@ -265,12 +267,22 @@ public class Parser {
 
 		// If in REPL mode and at the end, the ';' is optional
 		REPLSemicolon();
-		
+
 		return new Stmt.Expression(expr);
+	}
+	
+	//* Parse a full expression. Shortcut for the lowest precidence level.
+	private Expr expression() {
+		return comma();
+	}
+
+	//* Parse an expression without the comma operator. Shortcut for the lowest precidence level after the comma expression.
+	private Expr commaless() {
+		return assignment();
 	}
 
 	//* Parse an expression.
-	private Expr expression() {
+	private Expr comma() {
 		Expr expr = assignment();
 
 		while (match(COMMA)) {
@@ -288,7 +300,7 @@ public class Parser {
 
 	//* Parse an assignment (=) expression.
 	private Expr assignment() {
-		Expr expr = conditional();
+		Expr expr = functional();
 
 		if (match(EQUAL)) {
 			Token equals = previous();
@@ -309,6 +321,38 @@ public class Parser {
 			throw error(equals, "Invalid assignment target.");
 		}
 
+		return expr;
+	}
+
+	//* Parses an anonymous function expression.
+	private Expr functional() {
+		Expr expr;
+		if (match(FUNC)) {
+			consume(LEFT_PAREN, "Expected '(' after 'fun'.");
+			List<Token> parameters = new ArrayList<>();
+			if (!check(RIGHT_PAREN)) {
+				do {
+					if (parameters.size() >= 255) {
+						error(peek(), "Cannot have more than 255 parameters.");
+					}
+
+					parameters.add(consume(IDENTIFIER, "Expected parameter name."));
+				} while (match(COMMA));
+			}
+			consume(RIGHT_PAREN, "Expected ')' after parameters.");
+
+			consume(LEFT_BRACE, "Expected '{' before 'fun' body.");
+			List<Stmt> body = block();
+
+			return new Expr.Lambda(null, parameters, body);
+
+		// } else if (match(FUNC)) {
+		// 	Token name = consume(IDENTIFIER, "Names are not allowed for anonymous functions.");
+		//  Do above logic after eating identifier
+		} else {
+			expr = conditional();
+		}
+		
 		return expr;
 	}
 
@@ -488,7 +532,7 @@ public class Parser {
 					// _reports_, not _throws_, an error. The parser state isn't invalid, but a warning should be shown.'
 					error(peek(), "Cannot have more than 255 arguments.");
 				}
-				arguments.add(assignment());
+				arguments.add(commaless());
 			} while (match(COMMA));
 		}
 
@@ -549,6 +593,15 @@ public class Parser {
 		return peek().type == type;
 	}
 
+ 	//* Checks if the token after the current token matches the given token type. Does NOT consume either token.
+	private boolean checkNext(TokenType type) {
+		if (isAtEnd()) // Never match the end of the token sequence.
+			return false;
+		if (tokens.get(current + 1).type == EOF) // Never match beyond the end of the token sequence.
+			return false;
+		return tokens.get(current + 1).type == type;
+	}
+
 	//* Consumes the current token and returns it.
 	private Token advance() {
 		if (!isAtEnd()) // Never go beyond the end.
@@ -596,7 +649,7 @@ public class Parser {
 
 	//* Looks at the current token and returns whether it matches a start of a valid primary or unary.
 	private boolean isPrimaryNext() {
-		return checks(NUMBER, STRING, IDENTIFIER, TRUE, FALSE, NIL, LEFT_PAREN, MINUS, BANG);
+		return checks(NUMBER, STRING, IDENTIFIER, TRUE, FALSE, NIL, LEFT_PAREN, MINUS, BANG, FUNC);
 	}
 
 	//* Synchronizes the parser state and token sequence.
