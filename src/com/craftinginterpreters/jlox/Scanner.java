@@ -115,9 +115,9 @@ public class Scanner {
 				addToken(match('=') ? GREATER_EQUAL : GREATER);
 				break;
 			case '<':
-				if (match('='))
-					addToken(LESSER_EQUAL);
-				addToken(match('-') ? LESSER_DASH : LESSER);
+				addToken(match('=') ? LESSER_EQUAL : LESSER);
+				// if (match('=')) addToken(LESSER_EQUAL);
+				// addToken(match('-') ? LESSER_DASH : LESSER);
 				break;
 			case '/':
 				// Special handling b/c single char is token and dual chars mean a comment
