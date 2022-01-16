@@ -24,7 +24,7 @@ public class GenerateAST {
 				"Variable : Token name",
 				"Assign   : Token name, Expr value",
 				"Sequence : Expr first, Expr second",
-				"Ternary : Token operator, Expr left, Expr center, Expr right",
+				"Ternary  : Token operator, Expr left, Expr center, Expr right",
 				"Logical  : Token operator, Expr left, Expr right",
 				"Call     : Expr callee, Token paren, List<Expr> arguments"
 		));

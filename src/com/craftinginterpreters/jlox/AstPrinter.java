@@ -2,9 +2,6 @@ package com.craftinginterpreters.jlox;
 
 import java.util.List;
 
-import com.craftinginterpreters.jlox.Stmt.Function;
-import com.craftinginterpreters.jlox.Stmt.Return;
-
 // Implements the Visitor interface, so it requries accept methods for each type.
 public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 
@@ -146,7 +143,7 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 	}
 
 	@Override
-	public String visitFunctionStmt(Function stmt) {
+	public String visitFunctionStmt(Stmt.Function stmt) {
 		StringBuilder builder = new StringBuilder();
 
 		builder.append("(").append(stmt.name.lexeme);
@@ -160,7 +157,7 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 	}
 
 	@Override
-	public String visitReturnStmt(Return stmt) {
+	public String visitReturnStmt(Stmt.Return stmt) {
 		return parenthesize("return", stmt.value);
 	}
 

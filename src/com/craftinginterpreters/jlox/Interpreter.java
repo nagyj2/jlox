@@ -12,11 +12,11 @@ class RuntimeError extends RuntimeException {
 	}
 }
 
-class StopIteration extends RuntimeException {
+class Break extends RuntimeException {
 	final Token token;
 
-	public StopIteration(Token token) {
-		super(null, null, false, false);
+	public Break(Token token) {
+		super(null, null, false, false); // Used for control flow, so lighten the overhead
 		this.token = token;
 	}
 }
@@ -57,7 +57,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			}
 		} catch (RuntimeError error) {
 			Lox.runtimeError(error);
-		} catch (StopIteration error) {
+		} catch (Break error) {
 			Lox.runtimeError(new RuntimeError(error.token, "Unexpected '" + error.token.lexeme + "' outside loop or 'do'."));
 		}
 	}
@@ -122,7 +122,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			while (isTruthy(evaluate(stmt.condition))) {
 				execute(stmt.body);
 			}
-		} catch (StopIteration error) {
+		} catch (Break error) {
 			return null;
 		}
 
@@ -147,7 +147,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 				} while (isTruthy(evaluate(stmt.condition)));
 			}
 
-		} catch (StopIteration error) {
+		} catch (Break error) {
 			return null;
 		}
 
@@ -156,9 +156,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	
 	@Override
 	public Void visitBreakStmt(Stmt.Break stmt) {
-		throw new StopIteration(stmt.token);
+		throw new Break(stmt.token);
 	}
 
+	@Override
 	public Void visitReturnStmt(Stmt.Return stmt) {
 		Object value = null;
 		if (stmt.value != null) {

@@ -255,7 +255,7 @@ public class Parser {
 			value = expression();
 		}
 
-		consume(SEMICOLON, "Expected ';' after return value.");
+		REPLSemicolon();
 		return new Stmt.Return(keyword, value);
 	}
 
