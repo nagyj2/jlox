@@ -65,6 +65,8 @@ primary         -> NUMBER
   - Division by zero
 - Auto conversion for string concatenation
 - `break` statement
+- `do` statement and `do-while` loops
+  - `do` statements allow for `break` statements
 
 ### Types
 
