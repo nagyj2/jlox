@@ -25,7 +25,8 @@ public class GenerateAST {
 				"Assign   : Token name, Expr value",
 				"Sequence : Expr first, Expr second",
 				"Ternary : Token operator, Expr left, Expr center, Expr right",
-				"Logical  : Token operator, Expr left, Expr right"
+				"Logical  : Token operator, Expr left, Expr right",
+				"Call     : Expr callee, Token paren, List<Expr> arguments"
 		));
 
 		// Create statement nodes
@@ -37,7 +38,9 @@ public class GenerateAST {
 				"Print      : Expr expression",
 				"Var        : Token name, Expr initializer",
 				"If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
-				"While      : Expr condition, Stmt body"
+				"While      : Expr condition, Stmt body",
+				"Function   : Token name, List<Token> params, List<Stmt> body",
+				"Return     : Token keyword, Expr value"
 		));
 	}
 	

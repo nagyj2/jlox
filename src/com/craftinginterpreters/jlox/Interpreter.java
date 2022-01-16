@@ -1,5 +1,6 @@
 package com.craftinginterpreters.jlox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class RuntimeError extends RuntimeException {
@@ -14,15 +15,39 @@ class RuntimeError extends RuntimeException {
 class StopIteration extends RuntimeException {
 	final Token token;
 
-	public StopIteration(Token token, String message) {
-		super(message);
+	public StopIteration(Token token) {
+		super(null, null, false, false);
 		this.token = token;
 	}
 }
 
-public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+class Return extends RuntimeException {
+	final Object value;
 
-	private Environment environment = new Environment();
+	public Return(Object value) {
+		super(null, null, false, false);
+		this.value = value;
+	}
+}
+
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+	//* Top level environment. Stays fixed for the interpreter.
+	final Environment globals = new Environment();
+	//* Current environment for the interpreter. Starts with the global environment.
+	private Environment environment = globals;
+
+	Interpreter() {
+		// Create a native function with a Java anonymous class
+		globals.define("clock", new LoxCallable() {
+			@Override
+			public int arity() { return 0; }
+
+			@Override
+			public Object call(Interpreter interpreter, List<Object> arguments) {
+				return (double) System.currentTimeMillis() / 1000.0; // Retuns the current time in seconds.
+			}
+		});
+	}
 	
 	//* Start the evaluation of a program.
 	public void interpret(List<Stmt> statements) {
@@ -100,6 +125,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		} catch (StopIteration error) {
 			return null;
 		}
+
+		return null;
+	}
+	
+	@Override
+	public Void visitFunctionStmt(Stmt.Function stmt) {
+		LoxFunction function = new LoxFunction(stmt, environment); // Save the environment which declares the function, not calls
+		environment.define(stmt.name.lexeme, function);
 		return null;
 	}
 
@@ -123,7 +156,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	
 	@Override
 	public Void visitBreakStmt(Stmt.Break stmt) {
-		throw new StopIteration(stmt.token, "");
+		throw new StopIteration(stmt.token);
+	}
+
+	public Void visitReturnStmt(Stmt.Return stmt) {
+		Object value = null;
+		if (stmt.value != null) {
+			value = evaluate(stmt.value);
+		}
+
+		throw new Return(value);
 	}
 
 	//~ Expression Evaluation
@@ -242,6 +284,30 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		environment.assign(expr.name, value);
 		return value;
 	}
+
+	@Override
+	public Object visitCallExpr(Expr.Call expr) {
+		Object callee = evaluate(expr.callee);
+
+		List<Object> arguments = new ArrayList<>();
+		for (Expr argument : expr.arguments) {
+			arguments.add(evaluate(argument));
+		}
+
+		// Protect against non-callables being called, like 3.14() or "hello"()
+		if (!(callee instanceof LoxCallable)) {
+			throw new RuntimeError(expr.paren, "Can only call functions and classes");
+		}
+
+		LoxCallable function = (LoxCallable) callee; // Cast to a callable and then invoke call. All callables are implement LoxCallable
+
+		// Check function arity. Raise error if not enough/ too many are passed
+		if (arguments.size() < function.arity()) {
+			throw new RuntimeError(expr.paren, "Expected " + function.arity() + " arguments but got " + arguments.size() + ".");
+		}
+
+		return function.call(this, arguments); // Simply return whatever the call() returns
+	}
 	
 	@Override
 	public Object visitSequenceExpr(Expr.Sequence expr) {
@@ -267,7 +333,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	//~ Helper Functions
 
 	//* Evaluates all statements in a a block.
-	private void executeBlock(List<Stmt> statements, Environment environment) {
+	public void executeBlock(List<Stmt> statements, Environment environment) {
 		Environment previous = this.environment;
 		try {
 			this.environment = environment;

@@ -2,6 +2,9 @@ package com.craftinginterpreters.jlox;
 
 import java.util.List;
 
+import com.craftinginterpreters.jlox.Stmt.Function;
+import com.craftinginterpreters.jlox.Stmt.Return;
+
 // Implements the Visitor interface, so it requries accept methods for each type.
 public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 
@@ -114,6 +117,11 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 	public String visitAssignExpr(Expr.Assign expr) {
 		return parenthesize("assign", new Expr.Literal(expr.name), expr.value);
 	}
+
+	@Override
+	public String visitCallExpr(Expr.Call expr) {
+		return parenthesize("call " + print(expr.callee), expr.arguments.toArray(new Expr[0]));
+	}
 	
 	//~ Statements
 
@@ -135,6 +143,25 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 	@Override
 	public String visitVarStmt(Stmt.Var stmt) {
 		return parenthesize("var", new Expr.Literal(stmt.name), stmt.initializer);
+	}
+
+	@Override
+	public String visitFunctionStmt(Function stmt) {
+		StringBuilder builder = new StringBuilder();
+
+		builder.append("(").append(stmt.name.lexeme);
+		for (Token param : stmt.params) {
+			builder.append(" ");
+			builder.append(param.lexeme);
+		}
+		builder.append(" ").append(print(stmt.body));
+		builder.append(")");
+		return builder.toString();
+	}
+
+	@Override
+	public String visitReturnStmt(Return stmt) {
+		return parenthesize("return", stmt.value);
 	}
 
 	//~ Helper Functions
