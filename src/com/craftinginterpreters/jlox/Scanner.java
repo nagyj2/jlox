@@ -136,7 +136,7 @@ public class Scanner {
 
 				} else if (match('*')) {
 					// A block comment. Skip until end of line.
-					while (peek() != '*' && peekNext() != '/' && !isAtEnd()) {
+					while (!(peek() == '*' && peekNext() == '/') && !isAtEnd()) {
 						if (peek() == '\n')
 							line++;
 						advance();
