@@ -33,7 +33,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		} catch (RuntimeError error) {
 			Lox.runtimeError(error);
 		} catch (StopIteration error) {
-			Lox.runtimeError(new RuntimeError(error.token, "Unexpected '" + error.token.lexeme + "' outside loop."));
+			Lox.runtimeError(new RuntimeError(error.token, "Unexpected '" + error.token.lexeme + "' outside loop or 'do'."));
 		}
 	}
 	
