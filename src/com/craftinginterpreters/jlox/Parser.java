@@ -49,16 +49,22 @@ public class Parser {
 	
 	//* Parse a variable declaration. Note that the 'var' was consumed by the declaration() method.
 	private Stmt varDeclaration() {
-		Token name = consume(IDENTIFIER, "Expected variable name.");
 
-		Expr initializer = null;
-		if (match(EQUAL)) {
-			initializer = expression();
-		}
+		Stmt stmt = null;
+		do {
+			Token name = consume(IDENTIFIER, "Expected variable name.");
+	
+			Expr initializer = null;
+			if (match(EQUAL)) {
+				initializer = commaless();
+			}
+
+			stmt = new Stmt.Var(name, initializer, stmt);
+		} while (match(COMMA));
 
 		REPLSemicolon();
 		
-		return new Stmt.Var(name, initializer);
+		return stmt; 
 	}
 
 	//* Parse a function declaration.

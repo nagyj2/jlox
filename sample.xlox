@@ -154,15 +154,38 @@ for (var i = 0; i < 10; i = i + 1) {
 /*They*/ var /*can*/ l /*be*/ = /*placed*/ 0 /*anywhere*/ ; /*!*/
 print l == 0;
 
+// Multiple Variable Declarations
+
+var xa, xb = 3, xc = "hi", xd = false, xe = nil;
+print "" + xa;
+print "" + xb;
+print "" + xc;
+print "" + xd;
+print "" + xe;
+
 // Comma Expressions
+// Incompatible with inline declarations, like 'for', and function call expressions without parentheses.
 
 a = 1, b = a, c = b;
 print "Should be true:";
 print a == b and b == c and a == c;
 
-var j; var h;
-for (var i = 0, j = -1; i < 10; i = i + 1, j = j + 1) h=i;
-print h == j - 1;
+var hh; var h;
+for (var i = 0, j = -2; i < 10; i = i + 1, j = j + 1) 
+	h = i, hh = j;
+print h == hh + 2;
+print "" + h + (" " + hh);
+
+// Not working??
+var j = -1; var h; var r;
+for (var i = 0; i < 3; i = i + 1, j = j + 1) {
+	print i + " " + j;
+	h = i;
+	r = j;
+}
+print h + " . " + j + " -> " + r;
+print h + " =h j= " + j;
+print h == r + 1;
 
 // Ternary Operator
 

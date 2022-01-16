@@ -10,7 +10,7 @@ program         -> declarations* EOF ;
 declarations    -> varDecl
                  | funDecl
                  | statement ;
-varDecl         -> "var" IDENTIFIER ( "=" expression )? ";" ;
+varDecl         -> "var" IDENTIFIER ( "=" assignment )? ( "," IDENTIFIER ( "=" assignment )? )* ";" ;
 funDecl         -> "fun" function;
 function        -> IDENTIFIER "(" parameters? ")" block ;
 statement       -> block
