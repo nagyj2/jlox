@@ -114,10 +114,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		currentFunction = type; // Update current 'within-a-function' state
 
 		beginScope(); // New scope for function body
-		for (Token param : lambda.params) {
-			declare(param); // Define and initialize parameters
-			define(param);
+		if (lambda.params != null) {
+			for (Token param : lambda.params) {
+				declare(param); // Define and initialize parameters
+				define(param);
+			}
 		}
+		
 		resolve(lambda.body); // Resolve function body
 		// In _runtime_, we ignore the function AST's body and only touch it on a function call
 		// In _static analysis_, we immediately go into the body and perform work

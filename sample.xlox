@@ -580,5 +580,18 @@ var mc = MathConst();
 print "I am a " + mc.whoami();
 // print "pi = " + mc.pi(); // < Error! instances cannot call static methods
 
+// Getters
+
+class A{
+	say {
+		print "aaa";
+	}
+}
+
+var a = A();
+a.say;
+
+a.shout = fun { print "AAA!"; };
+a.shout;
 
 print "Completed sample.xlox!";

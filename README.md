@@ -15,8 +15,9 @@ declarations    -> varDecl
 varDecl         -> "var" IDENTIFIER ( "=" expression )? ";" ;
 letDecl         -> "let" IDENTIFIER "=" expression ";" ;
 funDecl         -> "fun" function;
-classDecl       -> "class" IDENTIFIER "{" ( "class"? function )* "}" ;
+classDecl       -> "class" IDENTIFIER "{" ( method )* "}" ;
 function        -> IDENTIFIER "(" parameters? ")" block ;
+method          -> "class"? IDENTIFIER ( "(" parameters? ")" )? block ;
 statement       -> block
                  | ifStmt
                  | whileStmt
@@ -40,7 +41,7 @@ expression      -> assignment ( "," assignment )*
 assignment      -> ( call "." )? IDENTIFIER "=" assignment
                  | ( call "." )? IDENTIFIER "="
                  | functional ;
-functional      -> "fun" "(" parameters? ")" block
+functional      -> "fun" ( "(" parameters? ")" )? block
                  | conditional ;
 conditional     -> logic_or ( "?" logic_or ":" conditional )* 
                  | logic_or "?" ":"

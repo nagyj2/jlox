@@ -26,8 +26,10 @@ public class LoxFunction implements LoxCallable {
 		Environment environment = new Environment(closure);
 
 		// Add each argument to the environment under the name of the parameter
-		for (int i = 0; i < declaration.params.size(); i++) {
-			environment.define(declaration.params.get(i).lexeme, false, arguments.get(i));
+		if (declaration.params != null) {
+			for (int i = 0; i < declaration.params.size(); i++) {
+				environment.define(declaration.params.get(i).lexeme, false, arguments.get(i));
+			}
 		}
 
 		// Execute the function body in the new environment
@@ -44,6 +46,8 @@ public class LoxFunction implements LoxCallable {
 
 	@Override
 	public int arity() {
+		if (declaration.params == null)
+			return 0;
 		return declaration.params.size();
 	}
 
@@ -53,5 +57,9 @@ public class LoxFunction implements LoxCallable {
 		return "<fn>";
 		// if (declaration == null)
 		// return "<fn " + declaration.name.lexeme + ">";
+	}
+
+	public boolean isGetter() {
+		return declaration.params == null;
 	}
 }
