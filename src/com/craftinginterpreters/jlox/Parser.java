@@ -89,14 +89,14 @@ public class Parser {
 		Token name = consume(IDENTIFIER, "Expected " + kind + " name.");
 
 		consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
-		List<Token> parameters = new ArrayList<>();
+		List<Token> params = new ArrayList<>();
 		if (!check(RIGHT_PAREN)) {
 			do {
-				if (parameters.size() >= 255) {
+				if (params.size() >= 255) {
 					error(peek(), "Cannot have more than 255 parameters.");
 				}
 
-				parameters.add(consume(IDENTIFIER, "Expected parameter name."));
+				params.add(consume(IDENTIFIER, "Expected parameter name."));
 			} while (match(COMMA));
 		}
 		consume(RIGHT_PAREN, "Expected ')' after parameters.");
@@ -104,7 +104,7 @@ public class Parser {
 		consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
 		List<Stmt> body = block();
 
-		return new Stmt.Function(name, parameters, body);
+		return new Stmt.Function(name, new Expr.Lambda(params, body));
 	}
 
 	//* Parse a class declaration
@@ -386,7 +386,7 @@ public class Parser {
 			consume(LEFT_BRACE, "Expected '{' before 'fun' body.");
 			List<Stmt> body = block();
 
-			return new Expr.Lambda(null, parameters, body);
+			return new Expr.Lambda(parameters, body);
 
 		// } else if (match(FUNC)) {
 		// 	Token name = consume(IDENTIFIER, "Names are not allowed for anonymous functions.");

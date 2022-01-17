@@ -109,16 +109,16 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 	}
 
 	//* Resolve a function's position in the scopes.
-	private void resolveFunction(Stmt.Function function, FunctionType type) {
+	private void resolveLambda(Expr.Lambda lambda, FunctionType type) {
 		FunctionType enclosingFunction = currentFunction; // save current enclosing function
 		currentFunction = type; // Update current 'within-a-function' state
 
 		beginScope(); // New scope for function body
-		for (Token param : function.params) {
+		for (Token param : lambda.params) {
 			declare(param); // Define and initialize parameters
 			define(param);
 		}
-		resolve(function.body); // Resolve function body
+		resolve(lambda.body); // Resolve function body
 		// In _runtime_, we ignore the function AST's body and only touch it on a function call
 		// In _static analysis_, we immediately go into the body and perform work
 		endScope();
@@ -153,7 +153,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		declare(stmt.name);
 		define(stmt.name); // Define right after declaration to allow for recursive functions
 
-		resolveFunction(stmt, FunctionType.FUNCTION);
+		resolveLambda(stmt.lambda, FunctionType.FUNCTION);
 		return null;
 	}
 	
@@ -173,7 +173,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 			if (method.name.lexeme.equals("init")) {
 				declaration = FunctionType.INITIALIZER;
 			}
-			resolveFunction(method, declaration);
+			resolveLambda(method.lambda, declaration);
 		}
 
 		currentClass = enclosingClass;
@@ -186,7 +186,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 	@Override
 	public Void visitLambdaExpr(Expr.Lambda expr) {
 		// No name to declare
-		resolveFunction(new Stmt.Function(expr.close, expr.params, expr.body), FunctionType.FUNCTION);
+		resolveLambda(expr, FunctionType.FUNCTION);
 		return null;
 	}
 

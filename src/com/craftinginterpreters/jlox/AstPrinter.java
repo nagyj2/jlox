@@ -161,11 +161,11 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 		StringBuilder builder = new StringBuilder();
 
 		builder.append("(").append(stmt.name.lexeme);
-		for (Token param : stmt.params) {
+		for (Token param : stmt.lambda.params) {
 			builder.append(" ");
 			builder.append(param.lexeme);
 		}
-		builder.append(" ").append(print(stmt.body));
+		builder.append(" ").append(print(stmt.lambda.body));
 		builder.append(")");
 		return builder.toString();
 	}

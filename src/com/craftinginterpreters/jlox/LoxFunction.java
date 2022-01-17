@@ -4,11 +4,11 @@ import java.util.List;
 
 //* _Runtime_ version of a Lox function
 public class LoxFunction implements LoxCallable {
-	private final Stmt.Function declaration; // Contains name, list of parameters and list of stmts
+	private final Expr.Lambda declaration; // Contains name, list of parameters and list of stmts
 	private final Environment closure; // Contains the environment preceding the function
 	private final boolean isInitializer; // Whether the function is an initializer. Overrides the function's return
 
-	LoxFunction(Stmt.Function declaration, Environment closure, boolean isInitializer) {
+	LoxFunction(Expr.Lambda declaration, Environment closure, boolean isInitializer) {
 		this.declaration = declaration;
 		this.closure = closure;
 		this.isInitializer = isInitializer;
@@ -50,8 +50,8 @@ public class LoxFunction implements LoxCallable {
 	@Override
 	// B/c This LoxFunction is passed around internally as an Object, if we print it in our lang, sysout will call toString() on it. Might as well implement it...
 	public String toString() {
-		if (declaration == null)
-			return "<fn>";
-		return "<fn " + declaration.name.lexeme +">";
+		return "<fn>";
+		// if (declaration == null)
+		// return "<fn " + declaration.name.lexeme + ">";
 	}
 }

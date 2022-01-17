@@ -115,7 +115,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	
 	@Override
 	public Void visitFunctionStmt(Stmt.Function stmt) {
-		LoxFunction function = new LoxFunction(stmt, environment, false); // Save the environment which declares the function, not calls
+		LoxFunction function = new LoxFunction(stmt.lambda, environment, false); // Save the environment which declares the function, not calls
 		environment.define(stmt.name.lexeme, false, function);
 		return null;
 	}
@@ -161,12 +161,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		Map<String, LoxFunction> staticmethods = new HashMap<>();
 
 		for (Stmt.Function function : stmt.classmethods) {
-			LoxFunction classmethod = new LoxFunction(function, environment, function.name.lexeme.equals("init")); // No anonymous functions in classes, so method.name is guarenteed
+			LoxFunction classmethod = new LoxFunction(function.lambda, environment, function.name.lexeme.equals("init")); // No anonymous functions in classes, so method.name is guarenteed
 			classmethods.put(function.name.lexeme, classmethod);
 		}
 
 		for (Stmt.Function function : stmt.staticmethods) {
-			LoxFunction staticmethod = new LoxFunction(function, environment, false);
+			LoxFunction staticmethod = new LoxFunction(function.lambda, environment, false);
 			staticmethods.put(function.name.lexeme, staticmethod);
 		}
 
@@ -333,7 +333,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	
 	@Override
 	public Object visitLambdaExpr(Expr.Lambda expr) {
-		LoxFunction function = new LoxFunction(new Stmt.Function(null, expr.params, expr.body), environment, false); // Save the environment which declares the function, not calls
+		LoxFunction function = new LoxFunction(expr, environment, false); // Save the environment which declares the function, not calls
 		return function;
 	}
 

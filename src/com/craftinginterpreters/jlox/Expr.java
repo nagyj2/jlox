@@ -98,12 +98,10 @@ abstract class Expr {
 	}
 
 	static class Lambda extends Expr {
-		final Token close;
 		final List<Token> params;
 		final List<Stmt> body;
 
-		Lambda(Token close, List<Token> params, List<Stmt> body) {
-			this.close = close;
+		Lambda(List<Token> params, List<Stmt> body) {
 			this.params = params;
 			this.body = body;
 		}
