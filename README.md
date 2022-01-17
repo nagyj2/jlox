@@ -9,9 +9,11 @@ Below is the grammar for xlox up to this point:
 program         -> declarations* EOF ;
 declarations    -> varDecl
                  | funDecl
+                 | classDecl
                  | statement ;
 varDecl         -> "var" IDENTIFIER ( "=" expression )? ";" ;
 funDecl         -> "fun" function;
+classDecl       -> "class" IDENTIFIER "{" function* "}" ;
 function        -> IDENTIFIER "(" parameters? ")" block ;
 statement       -> block
                  | ifStmt
@@ -28,7 +30,7 @@ printStmt       -> "print" expr ";" ;
 exprStmt        -> expression ";" ;
 returnStmt      -> "return expression? ";" ;
 expression      -> assignment ;
-assignment      -> IDENTIFIER "=" assignment
+assignment      -> ( call "." )? IDENTIFIER "=" assignment
                  | logic_or ;
 logic_or        -> logic_and ( "or" logic_and )* ;
 logic_and       -> equality ( "and" equality )* ;
@@ -38,12 +40,12 @@ term            -> factor ( ( "+" | "-" ) factor )* ;
 factor          -> unary ( ( "*" | "/" ) unary )* ;
 unary           -> ( "!" | "-" ) unary 
                  | call ;
-call            -> primary ( "(" arguments? ")" )* ;                 
+call            -> primary ( "(" arguments? ")" | "." IDENTIFIER )* ;                 
 primary         -> NUMBER
                  | STRING
                  | IDENTIFIER
-                 | "true" | "false" | "nil" ;
-                 | "(" expression ")"
+                 | "true" | "false" | "nil" | "this"
+                 | "(" expression ")" ;
 parameters      -> IDENTIFIER ( "," IDENTIFIER )* ;
 arguments       -> expression ( "," expression )* ;
 ```
