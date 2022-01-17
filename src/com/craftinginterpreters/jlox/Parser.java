@@ -443,7 +443,8 @@ public class Parser {
 			}
 
 			Expr right = logical_and();
-			expr = new Expr.Logical(operator, expr, right);
+			// expr = new Expr.Logical(operator, expr, right);
+			expr = foldLogical(operator, expr, right);
 		}
 
 		return expr;
@@ -462,7 +463,8 @@ public class Parser {
 			}
 
 			Expr right = equality();
-			expr = new Expr.Logical(operator, expr, right);
+			// expr = new Expr.Logical(operator, expr, right);
+			expr = foldLogical(operator, expr, right);
 		}
 
 		return expr;
@@ -481,7 +483,8 @@ public class Parser {
 			}
 			
 			Expr right = comparison();
-			expr = new Expr.Binary(operator, expr, right);
+			// expr = new Expr.Binary(operator, expr, right);
+			expr = foldBinary(operator, expr, right);
 		}
 
 		return expr;
@@ -500,7 +503,8 @@ public class Parser {
 			}
 
 			Expr right = term();
-			expr = new Expr.Binary(operator, expr, right);
+			// expr = new Expr.Binary(operator, expr, right);
+			expr = foldBinary(operator, expr, right);
 		}
 
 		return expr;
@@ -519,7 +523,8 @@ public class Parser {
 			}
 
 			Expr right = factor();
-			expr = new Expr.Binary(operator, expr, right);
+			// expr = new Expr.Binary(operator, expr, right);
+			expr = foldBinary(operator, expr, right);
 		}
 
 		return expr;
@@ -538,7 +543,8 @@ public class Parser {
 			}
 
 			Expr right = unary();
-			expr = new Expr.Binary(operator, expr, right);
+			// expr = new Expr.Binary(operator, expr, right);
+			expr = foldBinary(operator, expr, right);
 		}
 
 		return expr;
@@ -549,7 +555,8 @@ public class Parser {
 		while (match(MINUS, BANG)) {
 			Token operator = previous();
 			Expr right = unary();
-			return new Expr.Unary(operator, right);
+			// return new Expr.Unary(operator, right);
+			return foldUnary(operator, right);
 		}
 
 		return call();
@@ -606,10 +613,124 @@ public class Parser {
 		if (match(LEFT_PAREN)) {
 			Expr expr = expression();
 			consume(RIGHT_PAREN, "Expected ')' after expression.");
+			if (expr instanceof Expr.Literal)
+				return expr;
 			return new Expr.Grouping(expr);
 		}
 
 		throw error(peek(), "Expected expression.");
+	}
+
+	//~ Optimization Functions
+
+	//* Performs constant folding on unary and binary expression if both operands are literals.
+	private Expr foldBinary(Token operator, Expr left, Expr right) {
+
+		// Only want to fold if using constants! If one isnt constant just bundle them together and return
+		if (!(left instanceof Expr.Literal) || !(right instanceof Expr.Literal))
+			return new Expr.Binary(operator, left, right);
+
+		Expr.Literal left_lit = (Expr.Literal) left;
+		Expr.Literal right_lit = (Expr.Literal) right;
+		switch (operator.type) {
+			case MINUS:
+				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				return new Expr.Literal((double) left_lit.value - (double) right_lit.value);
+
+			case PLUS:
+				if (left_lit.value instanceof String) {
+					return new Expr.Literal((String) left_lit.value + LoxProperties.stringify(right_lit.value));
+				}
+
+				if (right_lit.value instanceof String) {
+					return new Expr.Literal(LoxProperties.stringify(left_lit.value) + (String) right_lit.value);
+				}
+
+				if (left_lit.value instanceof Double && right_lit.value instanceof Double) {
+					return new Expr.Literal((double) left_lit.value + (double) right_lit.value);
+				}
+			
+			case SLASH:
+				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				if ((double) right_lit.value == 0)
+					Lox.error(operator, "Division by 0.");
+				return new Expr.Literal((double) left_lit.value / (double) right_lit.value);
+			
+			case STAR:
+				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				return new Expr.Literal((double) left_lit.value * (double) right_lit.value);
+			
+			case LESSER:
+				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				return new Expr.Literal((double) left_lit.value < (double) right_lit.value);
+			
+			case GREATER:
+				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				return new Expr.Literal((double) left_lit.value > (double) right_lit.value);
+			
+			case LESSER_EQUAL:
+				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				return new Expr.Literal((double) left_lit.value <= (double) right_lit.value);
+			
+			case GREATER_EQUAL:
+				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				return new Expr.Literal((double) left_lit.value >= (double) right_lit.value);
+
+			case BANG_EQUAL:
+				return new Expr.Literal(LoxProperties.isEqual(left, right));
+
+			case EQUAL_EQUAL:
+				return new Expr.Literal(!LoxProperties.isEqual(left, right));
+
+			// If we implement more operators, let them slide through and bundle them at the end
+			// This function will act as a passive optimization for the runtime
+			default:
+				break;
+		}
+		
+		return new Expr.Binary(operator, left, right);
+	}
+
+	//* Perform constant folding on a logical (short circuit) expression.
+	private Expr foldLogical(Token operator, Expr left, Expr right) {
+		// Only want to fold if using constants! If one isnt constant just bundle them together and return
+		if (!(left instanceof Expr.Literal) || !(right instanceof Expr.Literal))
+			return new Expr.Logical(operator, left, right);
+
+		Expr.Literal left_lit = (Expr.Literal) left;
+		Expr.Literal right_lit = (Expr.Literal) right;
+		switch (operator.type) {
+			case AND:
+				if (!LoxProperties.isTruthy(left_lit.value))
+					return left;
+			case OR:
+				if (LoxProperties.isTruthy(left_lit.value))
+						return left;
+			default:
+				break;
+		}
+
+		return new Expr.Logical(operator, left, right);
+	}
+
+	//* Perform constant folding on a unary expression.
+	private Expr foldUnary(Token operator, Expr left) {
+		
+		if (!(left instanceof Expr.Literal))
+			return new Expr.Unary(operator, left);
+
+		Expr.Literal left_lit = (Expr.Literal) left;
+		switch (operator.type) {
+			case BANG:
+				return new Expr.Literal(!LoxProperties.isTruthy(left_lit.value));
+			case MINUS:
+				LoxProperties.checkNumberOperand(operator, left_lit.value);
+				return new Expr.Literal(-(double) left_lit.value);
+			default:
+				break;
+		}
+
+		return new Expr.Unary(operator, left);
 	}
 
 	//~ Utility Functions

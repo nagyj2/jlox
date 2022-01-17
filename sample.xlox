@@ -594,4 +594,14 @@ a.say;
 a.shout = fun { print "AAA!"; };
 a.shout;
 
+// Constant Folding
+
+print 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1;
+
+print 1 + 1 - 1 / (1 * 1) + (1 + 1 * 1 + 1 - 1 + (1 + 1));
+
+print 1 + 1 + 1 < 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1;
+
+print false and true and true or false and true;
+
 print "Completed sample.xlox!";

@@ -86,7 +86,10 @@ arguments       -> assignment ( "," assignment )* ;
 - Constant declarations
   - func statements **ARE NOT** constants
   - parameters **ARE NOT** constants 
-  - classes **ARE** constants
+  - classes **ARE NOT** constants
+- Static methods
+- Getters
+- Constant folding
 
 #### Desired Modifications
 
