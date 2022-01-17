@@ -10,7 +10,7 @@
 			"request": "launch",
 			"mainClass": "com.craftinginterpreters.jlox.Lox",
 			"projectName": "jlox_52d37a56",
-			"args": ["sample.lox"]
+			"args": ["sample.xlox"]
 		},
 		{
 			"type": "java",
