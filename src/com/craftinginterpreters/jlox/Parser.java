@@ -65,7 +65,7 @@ public class Parser {
 		Stmt stmt = null;
 		do {
 			Token name = consume(IDENTIFIER, "Expected variable name.");
-	
+
 			Expr initializer = null;
 			if (match(EQUAL)) {
 				initializer = expression();
@@ -75,36 +75,56 @@ public class Parser {
 		} while (false); // while (match(COMMA));
 
 		REPLSemicolon();
-		
-		return stmt; 
-	}
 
-	//* Parse a function declaration.
+		return stmt;
+	}
+	
+	//* Helper to parse a function declaration.
 	private Stmt funDeclaration() {
-		return function("function"); // Want a function to be made, so specify
+		return functionBody("function");
 	}
 
-	//* Parse a function declaration. Takes a string so that the code can be reused and the errors still make sense.
-	private Stmt function(String kind) {
+	//* Helper to method a class method declaration.
+	private Stmt methodDeclaration() {
+		return functionBody("method");
+	}
+
+	//* Helper to method a static class method declaration.
+	private Stmt staticMethodDeclaration() {
+		return functionBody("static method");
+	}
+
+
+	//* Parse a named function.
+	private Stmt functionBody(String kind) {
 		Token name = consume(IDENTIFIER, "Expected " + kind + " name.");
-
-		consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
+		return new Stmt.Function(name, (Expr.Lambda) lambdaBody(kind));
+	}
+	
+	//* Parse an anonymous function
+	private Expr lambdaBody(String kind) {
 		List<Token> params = new ArrayList<>();
-		if (!check(RIGHT_PAREN)) {
-			do {
-				if (params.size() >= 255) {
-					error(peek(), "Cannot have more than 255 parameters.");
-				}
-
-				params.add(consume(IDENTIFIER, "Expected parameter name."));
-			} while (match(COMMA));
+		if (match(LEFT_PAREN)) {
+			// consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
+			if (!check(RIGHT_PAREN)) {
+				do {
+					if (params.size() >= 255) {
+						error(peek(), "Cannot have more than 255 parameters.");
+					}
+	
+					params.add(consume(IDENTIFIER, "Expected parameter name."));
+				} while (match(COMMA));
+			}
+			consume(RIGHT_PAREN, "Expected ')' after parameters.");
+			
+		} else {
+			params = null;
 		}
-		consume(RIGHT_PAREN, "Expected ')' after parameters.");
 
 		consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
 		List<Stmt> body = block();
 
-		return new Stmt.Function(name, new Expr.Lambda(params, body));
+		return new Expr.Lambda(params, body);
 	}
 
 	//* Parse a class declaration
@@ -116,9 +136,9 @@ public class Parser {
 		List<Stmt.Function> statics = new ArrayList<>();
 		while (!check(RIGHT_BRACE) && !isAtEnd()) {
 			if (match(CLASS))
-				statics.add((Stmt.Function) function("static method"));
+				statics.add((Stmt.Function) staticMethodDeclaration());
 			else
-				methods.add((Stmt.Function) function("method"));
+				methods.add((Stmt.Function) methodDeclaration());
 		}
 
 		consume(RIGHT_BRACE, "Expected '}' after class body.");
@@ -370,23 +390,7 @@ public class Parser {
 	private Expr functional() {
 		Expr expr;
 		if (match(FUNC)) {
-			consume(LEFT_PAREN, "Expected '(' after 'fun'.");
-			List<Token> parameters = new ArrayList<>();
-			if (!check(RIGHT_PAREN)) {
-				do {
-					if (parameters.size() >= 255) {
-						error(peek(), "Cannot have more than 255 parameters.");
-					}
-
-					parameters.add(consume(IDENTIFIER, "Expected parameter name."));
-				} while (match(COMMA));
-			}
-			consume(RIGHT_PAREN, "Expected ')' after parameters.");
-
-			consume(LEFT_BRACE, "Expected '{' before 'fun' body.");
-			List<Stmt> body = block();
-
-			return new Expr.Lambda(parameters, body);
+			return lambdaBody("lambda");
 
 		// } else if (match(FUNC)) {
 		// 	Token name = consume(IDENTIFIER, "Names are not allowed for anonymous functions.");
