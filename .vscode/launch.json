@@ -6,31 +6,18 @@
 	"configurations": [
 		{
 			"type": "java",
-			"name": "Launch AstPrinter",
-			"request": "launch",
-			"mainClass": "com.craftinginterpreters.jlox.AstPrinter",
-			"projectName": "jlox_52d37a56"
-		},
-		{
-			"type": "java",
-			"name": "Launch Current File",
-			"request": "launch",
-			"mainClass": "${file}"
-		},
-		{
-			"type": "java",
-			"name": "Launch Lox",
-			"request": "launch",
-			"mainClass": "com.craftinginterpreters.jlox.Lox",
-			"projectName": "jlox_52d37a56"
-		},
-		{
-			"type": "java",
-			"name": "Run xLox Source",
+			"name": "Run Lox Source",
 			"request": "launch",
 			"mainClass": "com.craftinginterpreters.jlox.Lox",
 			"projectName": "jlox_52d37a56",
-			"args": ["sample.xlox"]
+			"args": ["sample.lox"]
+		},
+		{
+			"type": "java",
+			"name": "Run Lox REPL",
+			"request": "launch",
+			"mainClass": "com.craftinginterpreters.jlox.Lox",
+			"projectName": "jlox_52d37a56"
 		},
 		{
 			"type": "java",

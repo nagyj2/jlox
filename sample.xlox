@@ -218,6 +218,17 @@ print "Add 'slip' = false property";
 counter.slip = false;
 print counter.slip;
 
+class Cake{
+	taste(){
+		var adjective = "delicious";
+		print "This " + this.flavour + " cake is " + adjective + "!";
+	}
+}
+
+var cake = Cake();
+cake.flavour = "German Chocolate";
+cake.taste();
+
 
 // xLox Features
 /* Block Comments! */
