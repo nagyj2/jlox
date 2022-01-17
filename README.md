@@ -15,7 +15,7 @@ declarations    -> varDecl
 varDecl         -> "var" IDENTIFIER ( "=" expression )? ";" ;
 letDecl         -> "let" IDENTIFIER "=" expression ";" ;
 funDecl         -> "fun" function;
-classDecl       -> "class" IDENTIFIER "{" function* "}" ;
+classDecl       -> "class" IDENTIFIER "{" ( "class"? function )* "}" ;
 function        -> IDENTIFIER "(" parameters? ")" block ;
 statement       -> block
                  | ifStmt

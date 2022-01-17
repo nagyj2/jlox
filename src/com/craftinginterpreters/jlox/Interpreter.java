@@ -155,15 +155,23 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 	@Override
 	public Void visitClassStmt(Stmt.Class stmt) {
-		environment.define(stmt.name.lexeme, false, null); // Classes ARE constant
+		environment.define(stmt.name.lexeme, false, null); // Classes ARE NOT constant to allow recursion
 		
-		Map<String, LoxFunction> methods = new HashMap<>();
-		for (Stmt.Function method : stmt.methods) {
-			LoxFunction function = new LoxFunction(method, environment, method.name.lexeme.equals("init")); // No anonymous functions in classes, so method.name is guarenteed
-			methods.put(method.name.lexeme, function);
+		Map<String, LoxFunction> classmethods = new HashMap<>();
+		Map<String, LoxFunction> staticmethods = new HashMap<>();
+
+		for (Stmt.Function function : stmt.classmethods) {
+			LoxFunction classmethod = new LoxFunction(function, environment, function.name.lexeme.equals("init")); // No anonymous functions in classes, so method.name is guarenteed
+			classmethods.put(function.name.lexeme, classmethod);
 		}
-		
-		LoxClass klass = new LoxClass(stmt.name.lexeme, methods);
+
+		for (Stmt.Function function : stmt.staticmethods) {
+			LoxFunction staticmethod = new LoxFunction(function, environment, false);
+			staticmethods.put(function.name.lexeme, staticmethod);
+		}
+
+		LoxClass metaklass = new LoxClass(null, stmt.name.lexeme, staticmethods);
+		LoxClass klass = new LoxClass(metaklass, stmt.name.lexeme, classmethods);
 		environment.assign(stmt.name, klass); // By splitting, methods can refer to eachother
 
 		return null;

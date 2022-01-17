@@ -229,6 +229,120 @@ var cake = Cake();
 cake.flavour = "German Chocolate";
 cake.taste();
 
+class Node{
+	init(data){
+		this._data = data;
+		this._next = nil;
+	}
+
+	next(){
+		return this._next;
+	}
+
+	data(){
+		return this._data;
+	}
+
+	setNext(data){
+		this._next = Node(data);
+	}
+
+	delNext(){
+		this._next = nil;
+	}
+
+}
+
+class Vector{
+	init(){
+		this.size = 0;
+		this.head = nil;
+	}
+
+	append(data){
+		if (this.size == 0){
+			this.head = Node(data);
+			this.size = this.size + 1;
+			return this;
+		}
+
+		var node = this.head;
+		while (node.next() != nil){
+			node = node.next();
+		}
+		
+		node.setNext(data);
+		this.size = this.size + 1;
+		return this;
+	}
+
+	shrink(){
+		if (this.size <= 1){
+			this.head = nil;
+			this.size = 0;
+			return this;
+		}
+
+		var node = this.head;
+		while (node.next().next() != nil){
+			node = node.next();
+		}
+		
+		node.delNext();
+		this.size = this.size - 1;
+		return this;
+	}
+
+	search(key){
+
+		for (var node = this.head; node != nil; node = node.next()){
+			if (node.data() == key){
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	str(){
+		var string = "[";
+
+		if (this.size == 0)
+			return string + "]";
+		
+		string = string + this.head.data();
+
+		for (var node = this.head.next(); node != nil; node = node.next()){
+			string = string + ", " + node.data();
+		}
+
+		return string + "]";
+	}
+}
+
+var vector = Vector();
+vector.append(1).append(2).append(3).append(4).append(5);
+print "Size: " + vector.size;
+print vector.str();
+
+vector.shrink();
+print "New Size: " + vector.size;
+print vector.str();
+
+print "Has 2: " + vector.search(2);
+print "Has 5: " + vector.search(5);
+
+vector.shrink().shrink();
+print "New Size: " + vector.size;
+print vector.str();
+
+var newVec = Vector();
+newVec.append(true).append(true).append(false);
+print "New Vector Size: " + newVec.size;
+print newVec.str();
+print "Original Vector Size: " + vector.size;
+print vector.str();
+
 
 // xLox Features
 /* Block Comments! */
@@ -441,6 +555,30 @@ thing.func();
 
 thing.func2 = fun(a){print a;};
 thing.func2("im a arg");
+
+
+// Static Methods
+
+Vector.whoami = fun () {return "Vector";};
+print "Vector.whoami(): " + Vector.whoami();
+// print "vector.whoami(): " + vector.whoami(); //< Error! function was added to Vector class
+
+class MathConst{
+	whoami(){return "MathConst";}
+	class pi(){return 3.14;}
+	class e(){return 2.718;}
+	class g(){return 9.8;}
+	class goldenRatio(){return 1.618;}
+	class sqrt2(){return 1.414;}
+	class sqrt3(){return 1.732;}
+}
+
+print "pi = " + MathConst.pi();
+print "e = " + MathConst.e();
+
+var mc = MathConst();
+print "I am a " + mc.whoami();
+// print "pi = " + mc.pi(); // < Error! instances cannot call static methods
 
 
 print "Completed sample.xlox!";

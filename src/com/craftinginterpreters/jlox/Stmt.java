@@ -45,11 +45,13 @@ abstract class Stmt {
 
 	static class Class extends Stmt {
 		final Token name;
-		final List<Stmt.Function> methods;
+		final List<Stmt.Function> classmethods;
+		final List<Stmt.Function> staticmethods;
 
-		Class(Token name, List<Stmt.Function> methods) {
+		Class(Token name, List<Stmt.Function> classmethods, List<Stmt.Function> staticmethods) {
 			this.name = name;
-			this.methods = methods;
+			this.classmethods = classmethods;
+			this.staticmethods = staticmethods;
 		}
 
 		@Override

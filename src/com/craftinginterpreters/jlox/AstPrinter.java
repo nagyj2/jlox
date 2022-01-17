@@ -175,7 +175,7 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 		StringBuilder builder = new StringBuilder();
 
 		builder.append("(class ").append(stmt.name.lexeme);
-		for (Stmt method : stmt.methods) {
+		for (Stmt method : stmt.classmethods) {
 			builder.append(" ");
 			builder.append(method.accept(this));
 		}
