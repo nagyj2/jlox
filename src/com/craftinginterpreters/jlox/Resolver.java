@@ -11,7 +11,14 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 	// Determines what type of function we are currently inside of.
 	private enum FunctionType {
 		NONE,
-		FUNCTION
+		FUNCTION,
+		INITIALIZER,
+		METHOD
+	}
+
+	private enum ClassType {
+		NONE,
+		CLASS
 	}
 
 	private enum BreakType {
@@ -28,6 +35,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
 	private FunctionType currentFunction = FunctionType.NONE;
 	private BreakType currentBreak = BreakType.NONE;
+	private ClassType currentClass = ClassType.NONE;
 
 	Resolver(Interpreter interpreter) {
 		this.interpreter = interpreter;
@@ -141,11 +149,35 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 	}
 
 	@Override
-	public Void visitFunctionStmt(Stmt.Function stmt){
+	public Void visitFunctionStmt(Stmt.Function stmt) {
 		declare(stmt.name);
 		define(stmt.name); // Define right after declaration to allow for recursive functions
 
 		resolveFunction(stmt, FunctionType.FUNCTION);
+		return null;
+	}
+	
+	@Override
+	public Void visitClassStmt(Stmt.Class stmt) {
+		ClassType enclosingClass = currentClass;
+		currentClass = ClassType.CLASS;
+
+		declare(stmt.name); // Allows classes to be local
+		define(stmt.name);
+
+		beginScope(); // Open a scope for the class
+		scopes.peek().put("this", true); // Insert 'this' into the scope b/c it isnt declared anywhere
+		
+		for (Stmt.Function method : stmt.methods) {
+			FunctionType declaration = FunctionType.METHOD;
+			if (method.name.lexeme.equals("init")) {
+				declaration = FunctionType.INITIALIZER;
+			}
+			resolveFunction(method, declaration);
+		}
+
+		currentClass = enclosingClass;
+		endScope();
 		return null;
 	}
 
@@ -178,6 +210,16 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		return null;
 	}
 
+	@Override
+	public Void visitThisExpr(Expr.This expr) {
+		if (currentClass == ClassType.NONE) {
+			Lox.error(expr.keyword, "Cannot use 'this' outside of a class.");
+			return null;
+		}
+		// 'this' acts like a variable, t.f. it is resolved in the same way as a variable.
+		resolveLocal(expr, expr.keyword);
+		return null;
+	}
 
 	//~ 'Simple' Traversals
 
@@ -211,8 +253,11 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 			Lox.error(stmt.keyword, "Cannot return from top-level code.");
 		}
 
-		if (stmt.value != null)
+		if (stmt.value != null) {
+			if (currentFunction == FunctionType.INITIALIZER)
+				Lox.error(stmt.keyword, "Cannot return a value from an initializer.");
 			resolve(stmt.value);
+		}
 		return null;
 	}
 
@@ -298,9 +343,24 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 	}
 
 	@Override
+	public Void visitGetExpr(Expr.Get expr) {
+		resolve(expr.object);
+		// Properties are looked up dynamically, so we don't need to do anything here for expr.name
+		return null;
+	}
+
+	@Override
 	public Void visitSequenceExpr(Expr.Sequence expr) {
 		resolve(expr.first);
 		resolve(expr.second);
+		return null;
+	}
+
+	@Override
+	public Void visitSetExpr(Expr.Set expr) {
+		resolve(expr.value);
+		resolve(expr.object);
+		// Properties are looked up dynamically, so we don't need to do anything here for expr.name
 		return null;
 	}
 

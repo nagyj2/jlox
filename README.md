@@ -10,10 +10,12 @@ program         -> declarations* EOF ;
 declarations    -> varDecl
                  | letDecl
                  | funDecl
+                 | classDecl
                  | statement ;
 varDecl         -> "var" IDENTIFIER ( "=" expression )? ";" ;
 letDecl         -> "let" IDENTIFIER "=" expression ";" ;
 funDecl         -> "fun" function;
+classDecl       -> "class" IDENTIFIER "{" function* "}" ;
 function        -> IDENTIFIER "(" parameters? ")" block ;
 statement       -> block
                  | ifStmt
@@ -35,15 +37,14 @@ returnStmt      -> "return expression? ";" ;
 exprStmt        -> expression ";" ;
 expression      -> assignment ( "," assignment )*
                  | assignment "," ;
-assignment      -> IDENTIFIER "=" assignment
-                 | IDENTIFIER "="
+assignment      -> ( call "." )? IDENTIFIER "=" assignment
+                 | ( call "." )? IDENTIFIER "="
                  | functional ;
 functional      -> "fun" "(" parameters? ")" block
                  | conditional ;
 conditional     -> logic_or ( "?" logic_or ":" conditional )* 
                  | logic_or "?" ":"
-                 | logic_or "?" logic_or ":"
-                 | logic_or ;
+                 | logic_or "?" logic_or ":" ;
 logic_or        -> logic_and ( "or" logic_and )*
                  | logic_and "or ;
 logic_and       -> equality ( "and" equality )* 
@@ -58,12 +59,12 @@ factor          -> unary ( ( "*" | "/" ) unary )*
                  | unary ( "*" | "/" ) ;
 unary           -> ( "!" | "-" ) unary 
                  | call ;
-call            -> primary ( "(" arguments? ")" )* ;                 
+call            -> primary ( "(" arguments? ")" | "." IDENTIFIER )* ;                 
 primary         -> NUMBER
                  | STRING
                  | IDENTIFIER
-                 | "true" | "false" | "nil"
-                 | "(" expression ")" ; 
+                 | "true" | "false" | "nil" | "this"
+                 | "(" expression ")" ;
 parameters      -> IDENTIFIER ( "," IDENTIFIER )* ;
 arguments       -> assignment ( "," assignment )* ;
 ```
@@ -82,8 +83,9 @@ arguments       -> assignment ( "," assignment )* ;
 - Lambda functions
 - **BROKEN** Multiple variable declaration within `var` using `,`
 - Constant declarations
-  - func statements are **NOT** constants
-  - parameters are **NOT** constants 
+  - func statements **ARE NOT** constants
+  - parameters **ARE NOT** constants 
+  - classes **ARE** constants
 
 #### Desired Modifications
 

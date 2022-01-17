@@ -167,4 +167,40 @@ var a = "outer";
 	showA(); // "inner"
 }
 
+// Classes
+
+class Animal {
+	speak() {
+		print "I'm an animal!";
+	}
+}
+
+var animal = Animal();
+animal.speak();
+var dog = animal;
+dog.speak();
+
+class Counter{
+	init(){
+		this.count = 0;
+		return;
+	}
+
+	inc(){
+		this.count = this.count + 1;
+		return this.count;
+	}
+}
+
+var counter = Counter();
+print counter.inc();
+print counter.inc();
+
+fun dec(c){
+	c.count = c.count - 1;
+	return c.count;
+}
+
+print dec(counter);
+
 print "Completed sample.lox!";

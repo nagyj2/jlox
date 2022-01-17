@@ -17,31 +17,35 @@ public class GenerateAST {
 
 		//Create expression nodes
 		defineAst(outputDir, "Expr", Arrays.asList(
-				"Binary   : Token operator, Expr left, Expr right",
-				"Unary    : Token operator, Expr right",
-				"Grouping : Expr expression",
-				"Literal  : Object value",
-				"Variable : Token name",
 				"Assign   : Token name, Expr value",
-				"Sequence : Expr first, Expr second",
-				"Ternary  : Token operator, Expr left, Expr center, Expr right",
-				"Logical  : Token operator, Expr left, Expr right",
+				"Binary   : Token operator, Expr left, Expr right",
+				"Call     : Expr callee, Token paren, List<Expr> arguments",
+				"Get      : Expr object, Token name",
+				"Grouping : Expr expression",
 				"Lambda   : Token close, List<Token> params, List<Stmt> body",
-				"Call     : Expr callee, Token paren, List<Expr> arguments"
+				"Literal  : Object value",
+				"Logical  : Token operator, Expr left, Expr right",
+				"Sequence : Expr first, Expr second",
+				"Set			: Expr object, Token name, Expr value",
+				"Ternary  : Token operator, Expr left, Expr center, Expr right",
+				"This     : Token keyword",
+				"Unary    : Token operator, Expr right",
+				"Variable : Token name"
 		));
 
 		// Create statement nodes
 		defineAst(outputDir, "Stmt", Arrays.asList(
-				"Break      : Token token",
-				"Do         : Stmt body, Expr condition",
 				"Block      : List<Stmt> statements",
+				"Break      : Token token",
+				"Class      : Token name, List<Stmt.Function> methods",
+				"Do         : Stmt body, Expr condition",
 				"Expression : Expr expression",
-				"Print      : Expr expression",
-				"Var        : Token name, Expr initializer, boolean constant, Stmt next",
-				"If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
-				"While      : Expr condition, Stmt body",
 				"Function   : Token name, List<Token> params, List<Stmt> body",
-				"Return     : Token keyword, Expr value"
+				"If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
+				"Print      : Expr expression",
+				"Return     : Token keyword, Expr value",
+				"Var        : Token name, Expr initializer, boolean constant, Stmt next",
+				"While      : Expr condition, Stmt body"
 		));
 	}
 	
