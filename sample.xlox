@@ -179,14 +179,14 @@ var a = "outer";
 /*They*/ var /*can*/ l /*be*/ = /*placed*/ 0 /*anywhere*/ ; /*!*/
 print l == 0;
 
-// Multiple Variable Declarations
-
-var xa, xb = 3, xc = "hi", xd = false, xe = nil;
-print "" + xa;
-print "" + xb;
-print "" + xc;
-print "" + xd;
-print "" + xe;
+// Multiple Variable Declarations **BROKEN**
+// 
+// var xa, xb = 3, xc = "hi", xd = false, xe = nil;
+// print "" + xa;
+// print "" + xb;
+// print "" + xc;
+// print "" + xd;
+// print "" + xe;
 
 // Comma Expressions
 // Incompatible with inline declarations, like 'for', and function call expressions without parentheses.
@@ -195,11 +195,11 @@ a = 1, b = a, c = b;
 print "Should be true:";
 print a == b and b == c and a == c;
 
-var hh; var h;
+var j; var h;
 for (var i = 0, j = -2; i < 10; i = i + 1, j = j + 1) 
-	h = i, hh = j;
-print h == hh + 2;
-print "" + h + (" " + hh);
+	h = i;
+print h == j + 2;
+print "" + h + (" " + j);
 
 // Not working??
 var j = -1; var h; var r;
@@ -367,5 +367,6 @@ var a = "global";
 	a = "local";
 	showA();
 }
+
 
 print "Completed sample.xlox!";

@@ -11,8 +11,8 @@ declarations    -> varDecl
                  | letDecl
                  | funDecl
                  | statement ;
-varDecl         -> "var" IDENTIFIER ( "=" assignment )? ( "," IDENTIFIER ( "=" assignment )? )* ";" ;
-letDecl         -> "let" IDENTIFIER "=" assignment ( "," IDENTIFIER "=" assignment )* ";" ;
+varDecl         -> "var" IDENTIFIER ( "=" expression )? ";" ;
+letDecl         -> "let" IDENTIFIER "=" expression ";" ;
 funDecl         -> "fun" function;
 function        -> IDENTIFIER "(" parameters? ")" block ;
 statement       -> block
@@ -80,7 +80,7 @@ arguments       -> assignment ( "," assignment )* ;
 - `do` statement and `do-while` loops
   - `do` statements allow for `break` statements
 - Lambda functions
-- Multiple variable declaration within `var` using `,`
+- **BROKEN** Multiple variable declaration within `var` using `,`
 - Constant declarations
   - func statements are **NOT** constants
   - parameters are **NOT** constants 

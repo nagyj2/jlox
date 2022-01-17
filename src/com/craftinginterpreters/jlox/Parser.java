@@ -66,11 +66,11 @@ public class Parser {
 	
 			Expr initializer = null;
 			if (match(EQUAL)) {
-				initializer = commaless();
+				initializer = expression();
 			}
 
 			stmt = new Stmt.Var(name, initializer, constant, stmt);
-		} while (match(COMMA));
+		} while (false); // while (match(COMMA));
 
 		REPLSemicolon();
 		
