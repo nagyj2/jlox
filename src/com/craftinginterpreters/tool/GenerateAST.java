@@ -17,30 +17,31 @@ public class GenerateAST {
 
 		//Create expression nodes
 		defineAst(outputDir, "Expr", Arrays.asList(
-				"Binary   : Expr left, Token operator, Expr right",
-				"Unary    : Token operator, Expr right",
-				"Grouping : Expr expression",
-				"Literal  : Object value",
-				"Variable : Token name",
 				"Assign   : Token name, Expr value",
-				"Logical  : Token operator, Expr left, Expr right",
+				"Binary   : Expr left, Token operator, Expr right",
 				"Call     : Expr callee, Token paren, List<Expr> arguments",
 				"Get      : Expr object, Token name",
+				"Grouping : Expr expression",
+				"Literal  : Object value",
+				"Logical  : Token operator, Expr left, Expr right",
 				"Set			: Expr object, Token name, Expr value",
-				"This     : Token keyword"
+				"Super    : Token keyword, Token method",
+				"This     : Token keyword",
+				"Unary    : Token operator, Expr right",
+				"Variable : Token name"
 		));
 
 		// Create statement nodes
 		defineAst(outputDir, "Stmt", Arrays.asList(
 				"Block      : List<Stmt> statements",
+				"Class      : Token name, Expr.Variable superclass, List<Stmt.Function> methods",
 				"Expression : Expr expression",
-				"Print      : Expr expression",
-				"Var        : Token name, Expr initializer",
-				"If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
-				"While      : Expr condition, Stmt body",
 				"Function   : Token name, List<Token> params, List<Stmt> body",
+				"If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
+				"Print      : Expr expression",
 				"Return     : Token keyword, Expr value",
-				"Class      : Token name, List<Stmt.Function> methods"
+				"Var        : Token name, Expr initializer",
+				"While      : Expr condition, Stmt body"
 		));
 	}
 	

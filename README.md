@@ -13,7 +13,7 @@ declarations    -> varDecl
                  | statement ;
 varDecl         -> "var" IDENTIFIER ( "=" expression )? ";" ;
 funDecl         -> "fun" function;
-classDecl       -> "class" IDENTIFIER "{" function* "}" ;
+classDecl       -> "class" IDENTIFIER ( "<" IDENTIFIER )? "{" function* "}" ;
 function        -> IDENTIFIER "(" parameters? ")" block ;
 statement       -> block
                  | ifStmt
@@ -45,6 +45,7 @@ primary         -> NUMBER
                  | STRING
                  | IDENTIFIER
                  | "true" | "false" | "nil" | "this"
+                 | "super" "." IDENTIFIER
                  | "(" expression ")" ;
 parameters      -> IDENTIFIER ( "," IDENTIFIER )* ;
 arguments       -> expression ( "," expression )* ;

@@ -18,7 +18,8 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
 	private enum ClassType {
 		NONE,
-		CLASS
+		CLASS,
+		SUBCLASS
 	}
 
 	//* Interpreter to report variable location results to.
@@ -158,9 +159,23 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		declare(stmt.name); // Allows classes to be local
 		define(stmt.name);
 
+		if (stmt.superclass != null) { // Normally a global, but b/c Lox doesnt forbid local classes, we need to check for it
+			currentClass = ClassType.SUBCLASS; // Update current class state
+			if (stmt.name.lexeme.equals(stmt.superclass.name.lexeme))
+				Lox.error(stmt.superclass.name, "A class cannot inherit from itself.");
+
+			resolve(stmt.superclass);
+		}
+
+		// Add super to the environment of the class. Create it as a layer between the outer scope and class methods scope so it will catch
+		if (stmt.superclass != null) {
+			beginScope();
+			scopes.peek().put("super", true);
+		}
+
 		beginScope(); // Open a scope for the class
 		scopes.peek().put("this", true); // Insert 'this' into the scope b/c it isnt declared anywhere
-		
+
 		for (Stmt.Function method : stmt.methods) {
 			FunctionType declaration = FunctionType.METHOD;
 			if (method.name.lexeme.equals("init")) {
@@ -169,8 +184,23 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 			resolveFunction(method, declaration);
 		}
 
+		if (stmt.superclass != null)
+			endScope();
+
 		currentClass = enclosingClass;
 		endScope();
+		return null;
+	}
+	
+	@Override
+	public Void visitSuperExpr(Expr.Super expr) {
+		if (currentClass == ClassType.NONE)
+			Lox.error(expr.keyword, "Cannot use 'super' outside of a class.");
+		else if (currentClass != ClassType.SUBCLASS)
+			Lox.error(expr.keyword, "Cannot use 'super' in a class without a superclass.");
+
+		resolveLocal(expr, expr.keyword); // Resolve as if it were a variable
+		// b/c we defined super in the scope immediately before the class' we will always catch it there
 		return null;
 	}
 
