@@ -63,7 +63,6 @@ public class Parser {
 	//* Parse a new variable-like declaration.
 	private Stmt newDeclaration(boolean constant) {
 		Stmt stmt = null;
-		do {
 			Token name = consume(IDENTIFIER, "Expected variable name.");
 
 			Expr initializer = null;
@@ -71,8 +70,7 @@ public class Parser {
 				initializer = expression();
 			}
 
-			stmt = new Stmt.Var(name, initializer, constant, stmt);
-		} while (false); // while (match(COMMA));
+		stmt = new Stmt.Var(name, initializer, constant);
 
 		REPLSemicolon();
 

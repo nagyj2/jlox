@@ -154,13 +154,11 @@ abstract class Stmt {
 		final Token name;
 		final Expr initializer;
 		final boolean constant;
-		final Stmt next;
 
-		Var(Token name, Expr initializer, boolean constant, Stmt next) {
+		Var(Token name, Expr initializer, boolean constant) {
 			this.name = name;
 			this.initializer = initializer;
 			this.constant = constant;
-			this.next = next;
 		}
 
 		@Override

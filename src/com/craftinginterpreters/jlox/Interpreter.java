@@ -79,8 +79,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		}
 
 		environment.define(stmt.name, stmt.constant, value);
-		if (stmt.next != null)
-			visitVarStmt((Stmt.Var) stmt.next);
 		return null;
 	}
 
