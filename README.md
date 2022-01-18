@@ -15,7 +15,7 @@ declarations    -> varDecl
 varDecl         -> "var" IDENTIFIER ( "=" expression )? ";" ;
 letDecl         -> "let" IDENTIFIER "=" expression ";" ;
 funDecl         -> "fun" function;
-classDecl       -> "class" IDENTIFIER "{" ( method )* "}" ;
+classDecl       -> "class" IDENTIFIER ( "<" IDENTIFIER )? "{" method* "}" ;
 function        -> IDENTIFIER "(" parameters? ")" block ;
 method          -> "class"? IDENTIFIER ( "(" parameters? ")" )? block ;
 statement       -> block
@@ -65,6 +65,7 @@ primary         -> NUMBER
                  | STRING
                  | IDENTIFIER
                  | "true" | "false" | "nil" | "this"
+                 | "super" "." IDENTIFIER
                  | "(" expression ")" ;
 parameters      -> IDENTIFIER ( "," IDENTIFIER )* ;
 arguments       -> assignment ( "," assignment )* ;

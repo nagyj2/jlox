@@ -155,7 +155,19 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 	@Override
 	public Void visitClassStmt(Stmt.Class stmt) {
+		Object superclass = null; // Setup superclass
+		if (stmt.superclass != null) {
+			superclass = evaluate(stmt.superclass);
+			if (!(superclass instanceof LoxClass))
+				throw new RuntimeError(stmt.superclass.name, "Superclass must be a class.");
+		}
+		
 		environment.define(stmt.name.lexeme, false, null); // Classes ARE NOT constant to allow recursion
+		
+		if (stmt.superclass != null) {
+				environment = new Environment(environment); // b/c we added a scope in the resolver, we need this new scope to insert super
+				environment.define("super", true, superclass); // Disallow altering super. May change going forward?
+			}
 		
 		Map<String, LoxFunction> classmethods = new HashMap<>();
 		Map<String, LoxFunction> staticmethods = new HashMap<>();
@@ -170,14 +182,34 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			staticmethods.put(function.name.lexeme, staticmethod);
 		}
 
-		LoxClass metaklass = new LoxClass(null, stmt.name.lexeme, staticmethods);
-		LoxClass klass = new LoxClass(metaklass, stmt.name.lexeme, classmethods);
+		LoxClass metaklass = new LoxClass(stmt.name.lexeme, null, (LoxClass) superclass, staticmethods); // No metaclass for generated metaclasses, but it does get the superclass
+		LoxClass klass = new LoxClass(stmt.name.lexeme, metaklass, (LoxClass) superclass, classmethods);
+		
+		// Don't want to assign into the 'super' scope, so remove it
+		if (stmt.superclass != null) {
+			environment = environment.enclosing;
+		}
+		
 		environment.assign(stmt.name, klass); // By splitting, methods can refer to eachother
 
 		return null;
 	}
 
 	//~ Expression Evaluation
+
+	@Override
+	public Object visitSuperExpr(Expr.Super expr) {
+		int distance = locals.get(expr); // Find where the super is at
+		LoxClass superclass = (LoxClass) environment.getAt(distance, "super"); // Get the super
+		LoxInstance object = (LoxInstance) environment.getAt(distance - 1, "this"); // Get the object that called the super
+		// ^ works b/c we made a 1 env difference between the 'super' and 'this' scope in the resolver
+		LoxFunction method = superclass.findMethod(expr.method.lexeme); // Find the method in the super
+
+		if (method == null)
+			throw new RuntimeError(expr.method, "Undefined property '" + expr.method.lexeme + "'.");
+
+		return method.bind(object); // Bind the superclass' method to the current object
+	}
 
 	@Override
 	public Object visitBinaryExpr(Expr.Binary expr) {

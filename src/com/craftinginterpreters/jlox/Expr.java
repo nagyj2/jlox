@@ -14,6 +14,7 @@ abstract class Expr {
 		R visitLogicalExpr(Logical expr);
 		R visitSequenceExpr(Sequence expr);
 		R visitSetExpr(Set expr);
+		R visitSuperExpr(Super expr);
 		R visitTernaryExpr(Ternary expr);
 		R visitThisExpr(This expr);
 		R visitUnaryExpr(Unary expr);
@@ -171,6 +172,21 @@ abstract class Expr {
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitSetExpr(this);
+		}
+	}
+
+	static class Super extends Expr {
+		final Token keyword;
+		final Token method;
+
+		Super(Token keyword, Token method) {
+			this.keyword = keyword;
+			this.method = method;
+		}
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitSuperExpr(this);
 		}
 	}
 

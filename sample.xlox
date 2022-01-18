@@ -343,6 +343,45 @@ print newVec.str();
 print "Original Vector Size: " + vector.size;
 print vector.str();
 
+// Inheritance
+
+class Doughnut{
+	cook(){
+		print "Fry until golden brown";
+	}
+}
+
+class BostonCream < Doughnut {
+	cook(){
+		super.cook();
+		print "Pipe full of custard and coat with chocolate.";
+	}
+}
+
+Doughnut().cook();
+BostonCream().cook();
+
+class A{
+	method(){
+		print "Method A";
+	}
+}
+
+class B < A{
+	method(){
+		print "Method B";
+	}
+	test(){
+		super.method();
+	}
+}
+
+class C < B {}
+C().test(); // "Method A"
+A().method(); // "Method A"
+B().method(); // "Method B"
+C().method(); // "Method B"
+
 
 // xLox Features
 /* Block Comments! */

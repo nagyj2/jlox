@@ -5,7 +5,7 @@ import java.util.Map;
 
 //* Runtime version of a Lox class instance
 public class LoxInstance {
-	private LoxClass klass;
+	private LoxClass klass; // nullable
 	private final Map<String, Object> fields = new HashMap<>();
 
 	LoxInstance(LoxClass klass) {

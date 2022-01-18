@@ -45,13 +45,15 @@ abstract class Stmt {
 
 	static class Class extends Stmt {
 		final Token name;
-		final List<Stmt.Function> classmethods;
+		final Expr.Variable superclass;
 		final List<Stmt.Function> staticmethods;
+		final List<Stmt.Function> classmethods;
 
-		Class(Token name, List<Stmt.Function> classmethods, List<Stmt.Function> staticmethods) {
+		Class(Token name, Expr.Variable superclass, List<Stmt.Function> staticmethods, List<Stmt.Function> classmethods) {
 			this.name = name;
-			this.classmethods = classmethods;
+			this.superclass = superclass;
 			this.staticmethods = staticmethods;
+			this.classmethods = classmethods;
 		}
 
 		@Override

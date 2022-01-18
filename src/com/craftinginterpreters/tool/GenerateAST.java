@@ -27,6 +27,7 @@ public class GenerateAST {
 				"Logical  : Token operator, Expr left, Expr right",
 				"Sequence : Expr first, Expr second",
 				"Set			: Expr object, Token name, Expr value",
+				"Super    : Token keyword, Token method",
 				"Ternary  : Token operator, Expr left, Expr center, Expr right",
 				"This     : Token keyword",
 				"Unary    : Token operator, Expr right",
@@ -37,7 +38,7 @@ public class GenerateAST {
 		defineAst(outputDir, "Stmt", Arrays.asList(
 				"Block      : List<Stmt> statements",
 				"Break      : Token token",
-				"Class      : Token name, List<Stmt.Function> classmethods, List<Stmt.Function> staticmethods",
+				"Class      : Token name, Expr.Variable superclass, List<Stmt.Function> staticmethods, List<Stmt.Function> classmethods",
 				"Do         : Stmt body, Expr condition",
 				"Expression : Expr expression",
 				"Function   : Token name, Expr.Lambda lambda",

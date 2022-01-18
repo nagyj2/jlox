@@ -203,6 +203,11 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 		return "this";
 	}
 
+	@Override
+	public String visitSuperExpr(Expr.Super expr) {
+		return "(super " + expr.method + ")";
+	}
+
 	//~ Helper Functions
 
 	private String parenthesize(String name, Expr... exprs) {
