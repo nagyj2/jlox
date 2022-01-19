@@ -48,12 +48,14 @@ abstract class Stmt {
 		final Expr.Variable superclass;
 		final List<Stmt.Function> staticmethods;
 		final List<Stmt.Function> classmethods;
+		final List<Stmt.Var> staticvars;
 
-		Class(Token name, Expr.Variable superclass, List<Stmt.Function> staticmethods, List<Stmt.Function> classmethods) {
+		Class(Token name, Expr.Variable superclass, List<Stmt.Function> staticmethods, List<Stmt.Function> classmethods, List<Stmt.Var> staticvars) {
 			this.name = name;
 			this.superclass = superclass;
 			this.staticmethods = staticmethods;
 			this.classmethods = classmethods;
+			this.staticvars = staticvars;
 		}
 
 		@Override

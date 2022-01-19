@@ -63,12 +63,12 @@ public class Parser {
 	//* Parse a new variable-like declaration.
 	private Stmt newDeclaration(boolean constant) {
 		Stmt stmt = null;
-			Token name = consume(IDENTIFIER, "Expected variable name.");
+		Token name = consume(IDENTIFIER, "Expected variable name.");
 
-			Expr initializer = null;
-			if (match(EQUAL)) {
-				initializer = expression();
-			}
+		Expr initializer = null;
+		if (match(EQUAL)) {
+			initializer = expression();
+		}
 
 		stmt = new Stmt.Var(name, initializer, constant);
 
@@ -79,27 +79,23 @@ public class Parser {
 	
 	//* Helper to parse a function declaration.
 	private Stmt funDeclaration() {
-		return functionBody("function");
-	}
-
-	//* Helper to method a class method declaration.
-	private Stmt methodDeclaration() {
-		return functionBody("method");
+		Token name = consume(IDENTIFIER, "Expected function name.");
+		return new Stmt.Function(name, (Expr.Lambda) lambdaBody("function"));
 	}
 
 	//* Helper to method a static class method declaration.
-	private Stmt staticMethodDeclaration() {
-		return functionBody("static method");
-	}
-
-
-	//* Parse a named function.
-	private Stmt functionBody(String kind) {
+	private Stmt methodDeclaration(String kind) {
 		Token name = consume(IDENTIFIER, "Expected " + kind + " name.");
-		return new Stmt.Function(name, (Expr.Lambda) lambdaBody(kind));
+		// if (match(EQUAL)) {
+		// 	Stmt.Var varDecl = new Stmt.Var(name, commaless(), false);
+		// 	consume(SEMICOLON, "Expected ';' after variable declaration.");
+		// 	return varDecl;
+		// } else {
+		return new Stmt.Function(name, (Expr.Lambda) lambdaBody("static method"));
+		// }
 	}
 	
-	//* Parse an anonymous function
+	//* Parse an anonymous function body
 	private Expr lambdaBody(String kind) {
 		List<Token> params = new ArrayList<>();
 		if (match(LEFT_PAREN)) {
@@ -137,18 +133,27 @@ public class Parser {
 
 		consume(LEFT_BRACE, "Expected '{' before class body.");
 
-		List<Stmt.Function> methods = new ArrayList<>();
 		List<Stmt.Function> statics = new ArrayList<>();
+		List<Stmt.Var> staticvars    = new ArrayList<>();
+		List<Stmt.Function> methods = new ArrayList<>();
+		// List<Stmt.Var> classvar     = new ArrayList<>();
+
 		while (!check(RIGHT_BRACE) && !isAtEnd()) {
-			if (match(CLASS))
-				statics.add((Stmt.Function) staticMethodDeclaration());
-			else
-				methods.add((Stmt.Function) methodDeclaration());
+			if (match(CLASS)) {
+				// if (match(VAR)) {
+				// 	Stmt declaration = varDeclaration();
+				// 	staticvars.add((Stmt.Var) declaration);
+				// } else {
+				// }
+				Stmt declaration = methodDeclaration("static method");
+				statics.add((Stmt.Function) declaration);
+			} else {
+				Stmt declaration = methodDeclaration("method");
+				methods.add((Stmt.Function) declaration);
+			}
 		}
-
 		consume(RIGHT_BRACE, "Expected '}' after class body.");
-
-		return new Stmt.Class(name, superclass, statics, methods);
+		return new Stmt.Class(name, superclass, statics, methods, staticvars);
 	}
 
 	//* Parse a statement.
