@@ -91,6 +91,7 @@ arguments       -> assignment ( "," assignment )* ;
 - Static methods
 - Getters
 - Constant folding
+- Nestable block comments
 
 #### Desired Modifications
 
@@ -103,7 +104,6 @@ arguments       -> assignment ( "," assignment )* ;
 - Classes can integrated into syntax
   - Customizable syntax?
 - Syntax for final functions and parameters
-- Nestable block comments
 
 ### Types
 

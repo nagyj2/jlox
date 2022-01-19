@@ -1,5 +1,3 @@
-print "Testing sample.xlox";
-
 // Expression Statement Evaluation
 
 true or false;
@@ -642,5 +640,19 @@ print 1 + 1 - 1 / (1 * 1) + (1 + 1 * 1 + 1 - 1 + (1 + 1));
 print 1 + 1 + 1 < 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1;
 
 print false and true and true or false and true;
+
+// Nested Block Comments
+
+/* Here /* I /* Am! */*/*/
+
+/*Here/*I/* Am! */ */ */
+
+/*/*/* Here I Am! */*/*/
+
+/* Here /* I /* Am! */ */ */
+
+/*/*/* Here */ It */ Is */
+
+print "Testing sample.xlox";
 
 print "Completed sample.xlox!";

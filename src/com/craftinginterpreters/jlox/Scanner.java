@@ -276,17 +276,26 @@ public class Scanner {
 	//* Parses a block comment
 	private void blockComment() {
 		// A block comment. Skip until end of line.
-		while (!(peek() == '*' && peekNext() == '/') && !isAtEnd()) {
+			
+		// Tracking nested-ness of block comments
+		int blockCommentLevel = 1;
+
+		while (blockCommentLevel > 0 && !isAtEnd()) {
 			if (peek() == '\n')
 				line++;
+			else if (peek() == '*' && peekNext() == '/'){
+				blockCommentLevel--;
+				advance();
+			}
+			else if (peek() == '/' && peekNext() == '*') {
+				blockCommentLevel++;
+				advance();
+			}
 			advance();
 		}
 
 		if (current + 1 >= source.length()) {
 			Lox.error(line, "Unterminated block comment.");
-		} else {
-			advance(); // Skip the '*/'
-			advance();
 		}
 	}
 
