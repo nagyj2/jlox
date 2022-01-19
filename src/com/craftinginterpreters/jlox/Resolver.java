@@ -382,6 +382,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		resolve(expr.right);
 		return null;
 	}
+	
+		@Override
+		public Void visitSequenceExpr(Expr.Sequence expr) {
+			resolve(expr.first);
+			resolve(expr.second);
+			return null;
+		}
 
 	@Override
 	public Void visitGetExpr(Expr.Get expr) {
@@ -391,17 +398,25 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 	}
 
 	@Override
-	public Void visitSequenceExpr(Expr.Sequence expr) {
-		resolve(expr.first);
-		resolve(expr.second);
-		return null;
-	}
-
-	@Override
 	public Void visitSetExpr(Expr.Set expr) {
 		resolve(expr.value);
 		resolve(expr.object);
 		// Properties are looked up dynamically, so we don't need to do anything here for expr.name
+		return null;
+	}
+
+	@Override
+	public Void visitIndexExpr(Expr.Index expr) {
+		resolve(expr.index);
+		resolve(expr.object);
+		return null;
+	}
+
+	@Override
+	public Void visitPlaceExpr(Expr.Place expr) {
+		resolve(expr.value);
+		resolve(expr.index);
+		resolve(expr.object);
 		return null;
 	}
 

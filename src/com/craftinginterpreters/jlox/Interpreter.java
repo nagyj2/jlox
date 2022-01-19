@@ -291,6 +291,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	
 	@Override
 	public Object visitLiteralExpr(Expr.Literal expr) {
+		if (expr.value instanceof List) {
+			ArrayList<Object> list = new ArrayList<>();
+			for (Expr elem : (List<Expr>) (expr.value)) {
+				list.add(evaluate(elem));
+			}
+			return list;
+		}
 		return expr.value;
 	}
 	
@@ -411,6 +418,53 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 		Object value = evaluate(expr.value);
 		((LoxInstance) object).set(expr.name, value);
+		return value;
+	}
+
+	@Override
+	public Object visitIndexExpr(Expr.Index expr) {
+		Object index = evaluate(expr.index);
+
+		if (!(index instanceof Double) && (Double) index % 1 == 0) {
+			throw new RuntimeError(expr.position, "Index must be an integer.");
+		}
+		int intdex = ((Double) index).intValue();
+
+		Object object = evaluate(expr.object);
+
+		if (!(object instanceof List)) {
+			throw new RuntimeError(expr.position, "Only lists can be indexed.");
+		}
+
+		if (intdex < 0 || intdex >= ((List) object).size()) {
+			throw new RuntimeError(expr.position, "Index out of bounds.");
+		}
+
+		return ((List) object).get(intdex);
+	}
+
+	@Override
+	public Object visitPlaceExpr(Expr.Place expr) {
+		Object index = evaluate(expr.index);
+
+		if (!(index instanceof Double) && (Double) index % 1 == 0) {
+			throw new RuntimeError(expr.position, "Index must be an integer.");
+		}
+		int intdex = ((Double) index).intValue();
+
+		Object object = evaluate(expr.object);
+
+		if (!(object instanceof List)) {
+			throw new RuntimeError(expr.position, "Only lists can be indexed.");
+		}
+
+		if (intdex < 0 || intdex >= ((List) object).size()) {
+			throw new RuntimeError(expr.position, "Index out of bounds.");
+		}
+
+		Object value = evaluate(expr.value);
+
+		((List) object).set(intdex, value);
 		return value;
 	}
 	

@@ -4,8 +4,10 @@ enum TokenType {
 	// Single-character tokens.
 	LEFT_PAREN, // (
 	RIGHT_PAREN, // )
-	LEFT_BRACE, // {
-	RIGHT_BRACE, // }
+	LEFT_BRACE, // [
+	RIGHT_BRACE, // ]
+	LEFT_CURLY, // {
+	RIGHT_CURLY, // }
 	COMMA, // ,
 	DOT, // .
 	MINUS, // -

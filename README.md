@@ -38,8 +38,8 @@ returnStmt      -> "return expression? ";" ;
 exprStmt        -> expression ";" ;
 expression      -> assignment ( "," assignment )*
                  | assignment "," ;
-assignment      -> ( call "." )? IDENTIFIER "=" assignment
-                 | ( call "." )? IDENTIFIER "="
+assignment      -> ( call "." )? IDENTIFIER ( "[" assignment "]" ) "=" assignment
+                 | ( call "." )? IDENTIFIER ( "[" assignment "]" ) "="
                  | functional ;
 functional      -> "fun" ( "(" parameters? ")" )? block
                  | conditional ;
@@ -60,13 +60,14 @@ factor          -> unary ( ( "*" | "/" ) unary )*
                  | unary ( "*" | "/" ) ;
 unary           -> ( "!" | "-" ) unary 
                  | call ;
-call            -> primary ( "(" arguments? ")" | "." IDENTIFIER )* ;                 
+call            -> primary ( "(" arguments? ")" | "." IDENTIFIER | "[" assignment "]" )* ;   
 primary         -> NUMBER
                  | STRING
                  | IDENTIFIER
                  | "true" | "false" | "nil" | "this"
                  | "super" "." IDENTIFIER
-                 | "(" expression ")" ;
+                 | "(" expression ")" 
+                 | "[" assignment ( "," assignment )* "]" ;
 parameters      -> IDENTIFIER ( "," IDENTIFIER )* ;
 arguments       -> assignment ( "," assignment )* ;
 ```
@@ -92,6 +93,10 @@ arguments       -> assignment ( "," assignment )* ;
 - Getters
 - Constant folding
 - Nestable block comments
+- Lists!
+  - Indexable and assignable
+  - Nestable
+  - Can hold arbitrary length and type
 
 #### Desired Modifications
 
@@ -103,7 +108,11 @@ arguments       -> assignment ( "," assignment )* ;
 - Everything is a class
 - Classes can integrated into syntax
   - Customizable syntax?
-- Syntax for final functions and parameters
+- Modify Lists
+  - Add native operations
+  - Modify runtime to use 'LoxObject' style structure
+    - Implement an indexable interface so others can support
+- Migrate native Java runtime objects to 'LoxObject's
 
 ### Types
 

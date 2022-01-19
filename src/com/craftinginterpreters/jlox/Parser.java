@@ -115,7 +115,7 @@ public class Parser {
 			params = null;
 		}
 
-		consume(LEFT_BRACE, "Expected '{' before " + kind + " body.");
+		consume(LEFT_CURLY, "Expected '{' before " + kind + " body.");
 		List<Stmt> body = block();
 
 		return new Expr.Lambda(params, body);
@@ -131,14 +131,14 @@ public class Parser {
 			superclass = new Expr.Variable(previous());
 		}
 
-		consume(LEFT_BRACE, "Expected '{' before class body.");
+		consume(LEFT_CURLY, "Expected '{' before class body.");
 
 		List<Stmt.Function> statics = new ArrayList<>();
 		List<Stmt.Var> staticvars    = new ArrayList<>();
 		List<Stmt.Function> methods = new ArrayList<>();
 		// List<Stmt.Var> classvar     = new ArrayList<>();
 
-		while (!check(RIGHT_BRACE) && !isAtEnd()) {
+		while (!check(RIGHT_CURLY) && !isAtEnd()) {
 			if (match(CLASS)) {
 				// if (match(VAR)) {
 				// 	Stmt declaration = varDeclaration();
@@ -152,13 +152,13 @@ public class Parser {
 				methods.add((Stmt.Function) declaration);
 			}
 		}
-		consume(RIGHT_BRACE, "Expected '}' after class body.");
+		consume(RIGHT_CURLY, "Expected '}' after class body.");
 		return new Stmt.Class(name, superclass, statics, methods, staticvars);
 	}
 
 	//* Parse a statement.
 	private Stmt statement() {
-		if (match(LEFT_BRACE)) {
+		if (match(LEFT_CURLY)) {
 			return new Stmt.Block(block());
 		}
 		if (match(IF)) {
@@ -190,11 +190,11 @@ public class Parser {
 	private List<Stmt> block() {
 		List<Stmt> statements = new ArrayList<>();
 
-		while (!check(RIGHT_BRACE) && !isAtEnd()) {
+		while (!check(RIGHT_CURLY) && !isAtEnd()) {
 			statements.add(declaration());
 		}
 
-		consume(RIGHT_BRACE, "Expected '}' after block.");
+		consume(RIGHT_CURLY, "Expected '}' after block.");
 		// return new Stmt.Block(statements);
 		return statements;
 	}
@@ -388,6 +388,13 @@ public class Parser {
 			} else if (expr instanceof Expr.Get) {
 				Expr.Get get = (Expr.Get) expr; // Cast so we can easily reconstruct the expr in the form we want (Expr.Set)
 				return new Expr.Set(get.object, get.name, value);
+			} else if (expr instanceof Expr.Index) {
+				Expr.Index index = (Expr.Index) expr;
+				return new Expr.Place(index.position, index.object, index.index, value);
+				// token index.position for error reporting, 
+				// index.object for the thing to set on
+				// index.index for the index to set at
+				// value for the value to set
 			}
 
 			throw error(equals, "Invalid assignment target.");
@@ -582,6 +589,11 @@ public class Parser {
 			} else if (match(DOT)) {
 				Token name = consume(IDENTIFIER, "Expected property name after '.'");
 				expr = new Expr.Get(expr, name);
+			} else if (match(LEFT_BRACE)) {
+				Expr index = expression();
+				Token position = previous();
+				consume(RIGHT_BRACE, "Expected ']' after index");
+				expr = new Expr.Index(position, expr, index);
 			} else {
 				break;
 			}
@@ -634,6 +646,16 @@ public class Parser {
 			if (expr instanceof Expr.Literal)
 				return expr;
 			return new Expr.Grouping(expr);
+		}
+		if (match(LEFT_BRACE)) {
+			List<Expr> elements = new ArrayList<>();
+			if (!check(RIGHT_BRACE)) {
+				do {
+					elements.add(commaless());
+				} while (match(COMMA));
+			}
+			consume(RIGHT_BRACE, "Expected ']' after elements.");
+			return new Expr.Literal(elements);
 		}
 
 		throw error(peek(), "Expected expression.");

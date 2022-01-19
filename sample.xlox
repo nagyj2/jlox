@@ -1,3 +1,5 @@
+print "Testing sample.xlox";
+
 // Expression Statement Evaluation
 
 true or false;
@@ -653,6 +655,28 @@ print false and true and true or false and true;
 
 /*/*/* Here */ It */ Is */
 
-print "Testing sample.xlox";
+// Arrays!
+
+var jeb = [[1,2,3],2,3];
+print jeb[2];
+
+var a = jeb[0];
+print a;
+
+jeb[0][0] = 5;
+
+print a;
+print jeb;
+
+jeb = [1, 1.2, "true", false, fun (){print "YAY";}, [1,2,3]];
+print jeb;
+
+var a = [2,3,4][0];
+print a;
+
+var jab = jeb[5];
+print jab[2];
+
+jeb[4]();
 
 print "Completed sample.xlox!";

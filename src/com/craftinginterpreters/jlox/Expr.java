@@ -9,9 +9,11 @@ abstract class Expr {
 		R visitCallExpr(Call expr);
 		R visitGetExpr(Get expr);
 		R visitGroupingExpr(Grouping expr);
+		R visitIndexExpr(Index expr);
 		R visitLambdaExpr(Lambda expr);
 		R visitLiteralExpr(Literal expr);
 		R visitLogicalExpr(Logical expr);
+		R visitPlaceExpr(Place expr);
 		R visitSequenceExpr(Sequence expr);
 		R visitSetExpr(Set expr);
 		R visitSuperExpr(Super expr);
@@ -98,6 +100,23 @@ abstract class Expr {
 		}
 	}
 
+	static class Index extends Expr {
+		final Token position;
+		final Expr object;
+		final Expr index;
+
+		Index(Token position, Expr object, Expr index) {
+			this.position = position;
+			this.object = object;
+			this.index = index;
+		}
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitIndexExpr(this);
+		}
+	}
+
 	static class Lambda extends Expr {
 		final List<Token> params;
 		final List<Stmt> body;
@@ -140,6 +159,25 @@ abstract class Expr {
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitLogicalExpr(this);
+		}
+	}
+
+	static class Place extends Expr {
+		final Token position;
+		final Expr object;
+		final Expr index;
+		final Expr value;
+
+		Place(Token position, Expr object, Expr index, Expr value) {
+			this.position = position;
+			this.object = object;
+			this.index = index;
+			this.value = value;
+		}
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitPlaceExpr(this);
 		}
 	}
 
