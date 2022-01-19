@@ -759,4 +759,28 @@ print "a6 : " + a[0];
 a[0] /= 3;
 print "a2 : " + a[0];
 
+// Constant Function and Class name binding
+
+let class Math{
+	class pi { return 3.1415; }
+	class e  { return 2.7182; }
+}
+
+print Math.e + Math.pi;
+// Math = 45; //< Error!
+// var Math = 23; //< Error!
+// let Math = 23; //< Error!
+
+Math.goldenRatio = 1.618; // Math variable is constant, not the class
+print Math.goldenRatio;
+
+
+let fun min (a, b) {
+	if (a < b) return a;
+	return b;
+}
+
+// min = 45; //< Error!
+// let min = 23; //< Error!
+
 print "Completed sample.xlox!";

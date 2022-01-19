@@ -47,6 +47,15 @@ public class Environment {
 		values.put(name, entry);
 	}
 
+	void updateConstant(Token token, boolean constant) {
+		if (values.containsKey(token.lexeme)) {
+			values.put(token.lexeme, new Entry(get(token), constant));
+			return;
+		}
+
+		Lox.error(token, "Constant change of non-existant variable.");
+	}
+
 
 	//* Looks up a variable in the current environment. If it does not exist, a runtime error is thrown. Used for global env.
 	Object get(Token name) {

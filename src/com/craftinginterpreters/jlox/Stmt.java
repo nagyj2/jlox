@@ -45,13 +45,15 @@ abstract class Stmt {
 
 	static class Class extends Stmt {
 		final Token name;
+		final boolean constant;
 		final Expr.Variable superclass;
 		final List<Stmt.Function> staticmethods;
 		final List<Stmt.Function> classmethods;
 		final List<Stmt.Var> staticvars;
 
-		Class(Token name, Expr.Variable superclass, List<Stmt.Function> staticmethods, List<Stmt.Function> classmethods, List<Stmt.Var> staticvars) {
+		Class(Token name, boolean constant, Expr.Variable superclass, List<Stmt.Function> staticmethods, List<Stmt.Function> classmethods, List<Stmt.Var> staticvars) {
 			this.name = name;
+			this.constant = constant;
 			this.superclass = superclass;
 			this.staticmethods = staticmethods;
 			this.classmethods = classmethods;
@@ -94,10 +96,12 @@ abstract class Stmt {
 
 	static class Function extends Stmt {
 		final Token name;
+		final boolean constant;
 		final Expr.Lambda lambda;
 
-		Function(Token name, Expr.Lambda lambda) {
+		Function(Token name, boolean constant, Expr.Lambda lambda) {
 			this.name = name;
+			this.constant = constant;
 			this.lambda = lambda;
 		}
 
@@ -154,13 +158,13 @@ abstract class Stmt {
 
 	static class Var extends Stmt {
 		final Token name;
-		final Expr initializer;
 		final boolean constant;
+		final Expr initializer;
 
-		Var(Token name, Expr initializer, boolean constant) {
+		Var(Token name, boolean constant, Expr initializer) {
 			this.name = name;
-			this.initializer = initializer;
 			this.constant = constant;
+			this.initializer = initializer;
 		}
 
 		@Override

@@ -40,16 +40,23 @@ public class Parser {
 
 	private Stmt declaration() {
 		try {
+			if (match(LET)) {
+				if (check(FUNC) && checkNext(IDENTIFIER)) {
+					match(FUNC);
+					return funDeclaration(true);
+				}
+				if (match(CLASS))
+					return classDeclaration(true);
+				return letDeclaration();
+			}
 			if (match(VAR))
 				return varDeclaration();
-			if (match(LET))
-				return letDeclaration();
 			if (check(FUNC) && checkNext(IDENTIFIER)) {
 				match(FUNC);
-				return funDeclaration();
+				return funDeclaration(false);
 			}
 			if (match(CLASS))
-				return classDeclaration();
+				return classDeclaration(false);
 
 			return statement();
 
@@ -78,7 +85,7 @@ public class Parser {
 			initializer = expression();
 		}
 
-		stmt = new Stmt.Var(name, initializer, constant);
+		stmt = new Stmt.Var(name, constant, initializer);
 
 		REPLSemicolon();
 
@@ -86,20 +93,20 @@ public class Parser {
 	}
 	
 	//* Helper to parse a function declaration.
-	private Stmt funDeclaration() {
+	private Stmt funDeclaration(boolean constant) {
 		Token name = consume(IDENTIFIER, "Expected function name.");
-		return new Stmt.Function(name, (Expr.Lambda) lambdaBody("function"));
+		return new Stmt.Function(name, constant, (Expr.Lambda) lambdaBody("function"));
 	}
 
 	//* Helper to method a static class method declaration.
-	private Stmt methodDeclaration(String kind) {
+	private Stmt methodDeclaration(String kind, boolean constant) {
 		Token name = consume(IDENTIFIER, "Expected " + kind + " name.");
 		// if (match(EQUAL)) {
 		// 	Stmt.Var varDecl = new Stmt.Var(name, commaless(), false);
 		// 	consume(SEMICOLON, "Expected ';' after variable declaration.");
 		// 	return varDecl;
 		// } else {
-		return new Stmt.Function(name, (Expr.Lambda) lambdaBody("static method"));
+		return new Stmt.Function(name, constant, (Expr.Lambda) lambdaBody("static method")); // methods inheret from the class
 		// }
 	}
 	
@@ -130,7 +137,7 @@ public class Parser {
 	}
 
 	//* Parse a class declaration
-	private Stmt classDeclaration() {
+	private Stmt classDeclaration(boolean constant) {
 		Token name = consume(IDENTIFIER, "Expected class name.");
 
 		Expr.Variable superclass = null;
@@ -153,15 +160,15 @@ public class Parser {
 				// 	staticvars.add((Stmt.Var) declaration);
 				// } else {
 				// }
-				Stmt declaration = methodDeclaration("static method");
+				Stmt.Function declaration = (Stmt.Function) methodDeclaration("static method", constant);
 				statics.add((Stmt.Function) declaration);
 			} else {
-				Stmt declaration = methodDeclaration("method");
+				Stmt.Function declaration = (Stmt.Function) methodDeclaration("method", constant);
 				methods.add((Stmt.Function) declaration);
 			}
 		}
 		consume(RIGHT_CURLY, "Expected '}' after class body.");
-		return new Stmt.Class(name, superclass, statics, methods, staticvars);
+		return new Stmt.Class(name, constant, superclass, statics, methods, staticvars);
 	}
 
 	//* Parse a statement.

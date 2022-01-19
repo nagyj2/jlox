@@ -14,8 +14,8 @@ declarations    -> varDecl
                  | statement ;
 varDecl         -> "var" IDENTIFIER ( "=" expression )? ";" ;
 letDecl         -> "let" IDENTIFIER "=" expression ";" ;
-funDecl         -> "fun" function;
-classDecl       -> "class" IDENTIFIER ( "<" IDENTIFIER )? "{" method* "}" ;
+funDecl         -> "let"? "fun" function;
+classDecl       -> "let"? "class" IDENTIFIER ( "<" IDENTIFIER )? "{" method* "}" ;
 function        -> IDENTIFIER "(" parameters? ")" block ;
 method          -> "class"? IDENTIFIER ( "(" parameters? ")" )? block ;
 statement       -> block
@@ -99,6 +99,9 @@ arguments       -> assignment ( "," assignment )* ;
   - Can hold arbitrary length and type
   - Appending and prepending with '+' (may change to '++')
 - Shorthand assignments
+- Constant function and class name binding
+  - Once a function or class has been bound to a variable, it cannot be rebound
+  - Note: The class itself can still be modified
 
 #### Desired Modifications
 

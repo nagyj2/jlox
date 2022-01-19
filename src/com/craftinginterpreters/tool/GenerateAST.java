@@ -40,14 +40,14 @@ public class GenerateAST {
 		defineAst(outputDir, "Stmt", Arrays.asList(
 				"Block      : List<Stmt> statements",
 				"Break      : Token token",
-				"Class      : Token name, Expr.Variable superclass, List<Stmt.Function> staticmethods, List<Stmt.Function> classmethods, List<Stmt.Var> staticvars",
+				"Class      : Token name, boolean constant, Expr.Variable superclass, List<Stmt.Function> staticmethods, List<Stmt.Function> classmethods, List<Stmt.Var> staticvars",
 				"Do         : Stmt body, Expr condition",
 				"Expression : Expr expression",
-				"Function   : Token name, Expr.Lambda lambda",
+				"Function   : Token name, boolean constant, Expr.Lambda lambda",
 				"If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
 				"Print      : Expr expression",
 				"Return     : Token keyword, Expr value",
-				"Var        : Token name, Expr initializer, boolean constant",
+				"Var        : Token name, boolean constant, Expr initializer",
 				"While      : Expr condition, Stmt body"
 		));
 	}

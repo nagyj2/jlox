@@ -114,7 +114,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	@Override
 	public Void visitFunctionStmt(Stmt.Function stmt) {
 		LoxFunction function = new LoxFunction(stmt.lambda, environment, false); // Save the environment which declares the function, not calls
-		environment.define(stmt.name.lexeme, false, function);
+		environment.define(stmt.name.lexeme, stmt.constant, function);
 		return null;
 	}
 
@@ -188,7 +188,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			environment = environment.enclosing;
 		}
 		
-		environment.assign(stmt.name, klass); // By splitting, methods can refer to eachother
+		environment.assign(stmt.name, klass); // By splitting, methods can refer to eachothe
+		environment.updateConstant(stmt.name, stmt.constant); // After creating class, set its const status
 
 		return null;
 	}
