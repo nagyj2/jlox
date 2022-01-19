@@ -38,8 +38,8 @@ returnStmt      -> "return expression? ";" ;
 exprStmt        -> expression ";" ;
 expression      -> assignment ( "," assignment )*
                  | assignment "," ;
-assignment      -> ( call "." )? IDENTIFIER ( "[" assignment "]" ) "=" assignment
-                 | ( call "." )? IDENTIFIER ( "[" assignment "]" ) "="
+assignment      -> ( call "." )? IDENTIFIER ( "[" assignment "]" ) ( "=" | "+=" | "-=" | "*=" | "/=" ) assignment
+                 | ( call "." )? IDENTIFIER ( "[" assignment "]" ) ( "=" | "+=" | "-=" | "*=" | "/=" )
                  | functional ;
 functional      -> "fun" ( "(" parameters? ")" )? block
                  | conditional ;
@@ -98,6 +98,7 @@ arguments       -> assignment ( "," assignment )* ;
   - Nestable
   - Can hold arbitrary length and type
   - Appending and prepending with '+' (may change to '++')
+- Shorthand assignments
 
 #### Desired Modifications
 

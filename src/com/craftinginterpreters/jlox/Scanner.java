@@ -91,17 +91,8 @@ public class Scanner {
 			case '.':
 				addToken(DOT);
 				break;
-			case '-':
-				addToken(MINUS);
-				break;
-			case '+':
-				addToken(PLUS);
-				break;
 			case ';':
 				addToken(SEMICOLON);
-				break;
-			case '*':
-				addToken(STAR);
 				break;
 			case ':':
 				addToken(COLON);
@@ -120,6 +111,23 @@ public class Scanner {
 				break;
 
 			// Single or dual char, literal-less tokens
+			case '*':
+				addToken(match('=') ? STAR_EQUAL : STAR);
+				break;
+			case '-':
+				addToken(match('-') ? MINUS_MINUS : match('=') ? MINUS_EQUAL : MINUS);
+				break;
+			case '+':
+				if (peek() == '+' && !(peekNext() == '+')) {
+					match('+');
+					addToken(PLUS_PLUS);
+				} else if (match('=')) {
+					addToken(PLUS_EQUAL);
+				} else {
+					addToken(PLUS);
+				}
+				// addToken(match('+') ? (peek() == '+' ? PLUS : PLUS_PLUS ) : PLUS);
+				break;
 			case '!':
 				addToken(match('=') ? BANG_EQUAL : BANG);
 				break;
@@ -130,9 +138,8 @@ public class Scanner {
 				addToken(match('=') ? GREATER_EQUAL : GREATER);
 				break;
 			case '<':
+				// addToken(match('=') ? LESSER_EQUAL : match('-') ? LESSER_MINUS : LESSER);
 				addToken(match('=') ? LESSER_EQUAL : LESSER);
-				// if (match('=')) addToken(LESSER_EQUAL);
-				// addToken(match('-') ? LESSER_DASH : LESSER);
 				break;
 			case '/':
 				// Special handling b/c single char is token and dual chars mean a comment
@@ -143,7 +150,10 @@ public class Scanner {
 
 				} else if (match('*')) {
 					blockComment();
-
+				
+				} else if (match('=')) {
+					addToken(SLASH_EQUAL);
+				
 				} else {
 					addToken(SLASH);
 				}
@@ -176,6 +186,7 @@ public class Scanner {
 
 	//* Consumes the current char and advances to the next one, returning it.
 	private char advance() {
+
 		current++;
 		return source.charAt(current - 1);
 	}

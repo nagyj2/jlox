@@ -27,7 +27,13 @@ enum TokenType {
 	GREATER_EQUAL, // >=
 	LESSER, // <
 	LESSER_EQUAL, // <=
-	LESSER_DASH, // <-
+	// LESSER_MINUS, // <-
+	PLUS_PLUS, // ++
+	MINUS_MINUS, // --
+	STAR_EQUAL, // *=
+	SLASH_EQUAL, // /=
+	MINUS_EQUAL, // -=
+	PLUS_EQUAL, // +=
 
 	// Literals.
 	IDENTIFIER,

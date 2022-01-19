@@ -14,6 +14,14 @@ public class Parser {
 
 	private final boolean isREPL; // Whether the parser was started in REPL mode
 
+	boolean usePrefixes = false; // Should prefix '--' and '++' be allowed?
+	/* Additional Grammar Rules when using prefixes:
+     unary  -> ( "!" | "-" ) unary 
+             | prefix ;
+     prefix -> ( "--" | "++" ) call ;
+             | call ;
+	 */
+
 	public Parser(List<Token> tokens, boolean isREPL) {
 		this.tokens = tokens;
 		this.isREPL = isREPL;
@@ -371,8 +379,9 @@ public class Parser {
 	private Expr assignment() {
 		Expr expr = functional();
 
-		if (match(EQUAL)) {
+		if (match(EQUAL, PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL)) {
 			Token equals = previous();
+			// Token operation = null;
 
 			if (!isPrimaryNext()) {
 				error(isAtEnd() ? peek() : previous(), "Expected r-value.");
@@ -382,12 +391,25 @@ public class Parser {
 			// b/c assignment is right associative, call this level recursively
 			Expr value = assignment();
 
+			// If not standard assignment, generate an binary node to represent the shorthand assignment
+			if (equals.type != EQUAL) {
+				Token operation = new Token(
+						equals.type == PLUS_EQUAL ? PLUS
+								: equals.type == MINUS_EQUAL ? MINUS : equals.type == STAR_EQUAL ? STAR : SLASH,
+						equals.lexeme, equals.literal, equals.line);
+				value = new Expr.Binary(operation, expr, value);
+			}
+
+
+
 			if (expr instanceof Expr.Variable) {
 				Token name = ((Expr.Variable) expr).name;
 				return new Expr.Assign(name, value);
+
 			} else if (expr instanceof Expr.Get) {
 				Expr.Get get = (Expr.Get) expr; // Cast so we can easily reconstruct the expr in the form we want (Expr.Set)
 				return new Expr.Set(get.object, get.name, value);
+
 			} else if (expr instanceof Expr.Index) {
 				Expr.Index index = (Expr.Index) expr;
 				return new Expr.Place(index.position, index.object, index.index, value);
@@ -396,7 +418,7 @@ public class Parser {
 				// index.index for the index to set at
 				// value for the value to set
 			}
-
+			
 			throw error(equals, "Invalid assignment target.");
 		}
 
@@ -574,6 +596,35 @@ public class Parser {
 			Expr right = unary();
 			// return new Expr.Unary(operator, right);
 			return foldUnary(operator, right);
+		}
+
+		return prefix();
+	}
+
+	//* Parse a prefix expression.
+	private Expr prefix() {
+
+		if (usePrefixes){
+			if (match(MINUS_MINUS, PLUS_PLUS)) {
+				Token operator = previous();
+				Expr expr = call();
+
+				if (expr instanceof Expr.Variable) {
+					Expr.Variable variable = (Expr.Variable) expr;
+
+					Expr adjustment = new Expr.Assign(variable.name,
+							new Expr.Binary(
+									new Token(operator.type == MINUS_MINUS ? MINUS : PLUS, operator.lexeme, operator.literal,
+											operator.line),
+									(Expr) new Expr.Variable(variable.name),
+									(Expr) new Expr.Literal((double) 1)));
+
+					expr = new Expr.Sequence(adjustment, variable);
+				}
+				return expr;
+			}
+			// return new Expr.Unary(operator, right);
+			// return foldUnary(operator, expr);
 		}
 
 		return call();
@@ -764,6 +815,11 @@ public class Parser {
 			return new Expr.Unary(operator, left);
 
 		Expr.Literal left_lit = (Expr.Literal) left;
+
+		if (left_lit.value instanceof List)
+			return new Expr.Unary(operator, left);
+
+
 		switch (operator.type) {
 			case BANG:
 				return new Expr.Literal(!LoxProperties.isTruthy(left_lit.value));
