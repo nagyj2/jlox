@@ -672,6 +672,10 @@ public class Parser {
 
 		Expr.Literal left_lit = (Expr.Literal) left;
 		Expr.Literal right_lit = (Expr.Literal) right;
+
+		if (left_lit.value instanceof List || right_lit.value instanceof List)
+			return new Expr.Binary(operator, left, right);
+
 		switch (operator.type) {
 			case MINUS:
 				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);

@@ -194,6 +194,16 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 	}
 
 	@Override
+	public String visitIndexExpr(Expr.Index expr) {
+		return "(index " + print(expr.object) + " " + print(expr.index) + ")";
+	}
+
+	@Override
+	public String visitPlaceExpr(Expr.Place expr) {
+		return "(place " + print(expr.object) + " " + print(expr.index) + " " + print(expr.value) +")";
+	}
+
+	@Override
 	public String visitSetExpr(Expr.Set expr) {
 		return parenthesize("set " + expr.name.lexeme, expr.object, expr.value);
 	}

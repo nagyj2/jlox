@@ -241,7 +241,17 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 					return (double) left + (double) right;
 				}
 
-				throw new RuntimeError(expr.operator, "Operands must either be 2 numbers or >=1 strings.");
+				if (left instanceof List) {
+					((List<Object>) left).add(right);
+					return left;
+				}
+
+				if (right instanceof List) {
+					((List<Object>) right).add(0, left);
+					return right;
+				}
+
+				throw new RuntimeError(expr.operator, "Incompatible types for '+'.");
 
 			case LESSER:
 				LoxProperties.checkNumberOperands(expr.operator, left, right);
@@ -290,9 +300,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	public Object visitLiteralExpr(Expr.Literal expr) {
 		if (expr.value instanceof List) {
-			ArrayList<Object> list = new ArrayList<>();
+			List<Object> list = new ArrayList<>();
 			for (Expr elem : (List<Expr>) (expr.value)) {
 				list.add(evaluate(elem));
 			}
@@ -422,6 +433,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Object visitIndexExpr(Expr.Index expr) {
 		Object index = evaluate(expr.index);
 
@@ -436,14 +448,15 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			throw new RuntimeError(expr.position, "Only lists can be indexed.");
 		}
 
-		if (intdex < 0 || intdex >= ((List) object).size()) {
+		if (intdex < 0 || intdex >= ((List<Object>) object).size()) {
 			throw new RuntimeError(expr.position, "Index out of bounds.");
 		}
 
-		return ((List) object).get(intdex);
+		return ((List<Object>) object).get(intdex);
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Object visitPlaceExpr(Expr.Place expr) {
 		Object index = evaluate(expr.index);
 
@@ -458,13 +471,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			throw new RuntimeError(expr.position, "Only lists can be indexed.");
 		}
 
-		if (intdex < 0 || intdex >= ((List) object).size()) {
+		if (intdex < 0 || intdex >= ((List<Object>) object).size()) {
 			throw new RuntimeError(expr.position, "Index out of bounds.");
 		}
 
 		Object value = evaluate(expr.value);
 
-		((List) object).set(intdex, value);
+		((List<Object>) object).set(intdex, value);
 		return value;
 	}
 	

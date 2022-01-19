@@ -97,6 +97,7 @@ arguments       -> assignment ( "," assignment )* ;
   - Indexable and assignable
   - Nestable
   - Can hold arbitrary length and type
+  - Appending and prepending with '+' (may change to '++')
 
 #### Desired Modifications
 

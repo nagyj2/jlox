@@ -1,5 +1,7 @@
 package com.craftinginterpreters.jlox;
 
+import java.util.List;
+
 //* Collection of functions used to determine Lox language properties.
 public final class LoxProperties {
 	private LoxProperties() {}
@@ -46,6 +48,19 @@ public final class LoxProperties {
 			if (text.endsWith(".0"))
 				text = text.substring(0, text.length() - 2);
 			return text;
+		}
+		if (object instanceof List) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("[");
+			List<Object> list = (List<Object>) object;
+			if (list.size() > 0) {
+				builder.append(stringify(list.get(0)));
+				for (int i = 1; i < list.size(); i++) {
+					builder.append(", ");
+					builder.append(stringify(list.get(i)));
+				}
+			}
+			return builder.append("]").toString();
 		}
 
 		return object.toString();

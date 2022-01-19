@@ -679,4 +679,13 @@ print jab[2];
 
 jeb[4]();
 
+// Appending and Prepending
+
+print [1,2,3,4] + 5;
+print [] + 5;
+print 5 + [1,2,3,4];
+print 5 + [];
+
+print 1 + [] + 2;
+
 print "Completed sample.xlox!";
