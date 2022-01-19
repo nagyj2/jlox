@@ -186,6 +186,14 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		beginScope(); // Open a scope for the class
 		scopes.peek().put("this", true); // Insert 'this' into the scope b/c it isnt declared anywhere
 		
+		for (Stmt.Function method : stmt.staticmethods) {
+			FunctionType declaration = FunctionType.METHOD;
+			if (method.name.lexeme.equals("init")) {
+				declaration = FunctionType.INITIALIZER;
+			}
+			resolveLambda(method.lambda, declaration);
+		}
+
 		for (Stmt.Function method : stmt.classmethods) {
 			FunctionType declaration = FunctionType.METHOD;
 			if (method.name.lexeme.equals("init")) {
