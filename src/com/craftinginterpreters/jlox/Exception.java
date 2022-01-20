@@ -1,15 +1,15 @@
 package com.craftinginterpreters.jlox;
 
 abstract class Exception extends RuntimeException {
-	Exception() {
-		super(null, null, false, false);
+	Exception(String message) {
+		super(message, null, false, false);
 	}
 
 	static class Break extends Exception {
 		final Token token;
 
 		public Break(Token token) {
-			super(); // Used for control flow, so lighten the overhead
+			super("Uncaught break."); // Used for control flow, so lighten the overhead
 			this.token = token;
 		}
 	}
@@ -18,7 +18,7 @@ abstract class Exception extends RuntimeException {
 		final Object value;
 		
 		public Return(Object value) {
-			super();
+			super("Uncaught return.");
 			this.value = value;
 		}
 	}
@@ -27,7 +27,7 @@ abstract class Exception extends RuntimeException {
 		final Token token;
 
 		public Runtime(Token token, String message) {
-			super();
+			super(message);
 			this.token = token;
 		}
 	}
