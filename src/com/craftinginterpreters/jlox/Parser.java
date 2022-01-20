@@ -97,7 +97,7 @@ public class Parser {
 	//* Helper to parse a function declaration.
 	private Stmt funDeclaration(boolean constant) {
 		Token name = consume(IDENTIFIER, "Expected function name.");
-		return new Stmt.Function(name, constant, (Expr.Lambda) lambdaBody("function"));
+		return new Stmt.Function(name, constant, (Expr.Lambda) nongetterFunction("function"));
 	}
 
 	//* Helper to method a static class method declaration.
@@ -108,12 +108,19 @@ public class Parser {
 		// 	consume(SEMICOLON, "Expected ';' after variable declaration.");
 		// 	return varDecl;
 		// } else {
-		return new Stmt.Function(name, constant, (Expr.Lambda) lambdaBody(kind)); // methods inheret from the class
+		return new Stmt.Function(name, constant, (Expr.Lambda) getterFunction(kind)); // methods inheret from the class
 		// }
 	}
 	
 	//* Parse an anonymous function body
-	private Expr lambdaBody(String kind) {
+	private List<Stmt> lambdaBody(String kind) {
+		consume(LEFT_CURLY, "Expected '{' before " + kind + " body.");
+		List<Stmt> body = block();
+		return body;
+	}
+	
+	//* Parse parameters which allow getter-style (absent) parameters.
+	private List<Token> getterParams(String kind) {
 		List<Token> params = new ArrayList<>();
 		if (match(LEFT_PAREN)) {
 			// consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
@@ -122,19 +129,47 @@ public class Parser {
 					if (params.size() >= 255) {
 						error(peek(), "Cannot have more than 255 parameters.");
 					}
-	
+
 					params.add(consume(IDENTIFIER, "Expected parameter name."));
 				} while (match(COMMA));
 			}
 			consume(RIGHT_PAREN, "Expected ')' after parameters.");
-			
+
 		} else {
 			params = null;
 		}
 
-		consume(LEFT_CURLY, "Expected '{' before " + kind + " body.");
-		List<Stmt> body = block();
+		return params;
+	}
 
+	//* Parse parameters which does not allow getter-style (absent) parameters.
+	private List<Token> nongetterParams(String kind) {
+		List<Token> params = new ArrayList<>();
+		consume(LEFT_PAREN, "Expected '(' after " + kind + " name.");
+		if (!check(RIGHT_PAREN)) {
+			do {
+				if (params.size() >= 255) {
+					error(peek(), "Cannot have more than 255 parameters.");
+				}
+
+				params.add(consume(IDENTIFIER, "Expected parameter name."));
+			} while (match(COMMA));
+		}
+		consume(RIGHT_PAREN, "Expected ')' after parameters.");
+		return params;
+	}
+	
+	//* Parse a getter style function declaration.
+	private Expr getterFunction(String kind) {
+		List<Token> params = getterParams(kind);
+		List<Stmt> body = lambdaBody(kind);
+		return new Expr.Lambda(params, body);
+	}
+
+	//* Parse a non-getter style function declaration.
+	private Expr nongetterFunction(String kind) {
+		List<Token> params = nongetterParams(kind);
+		List<Stmt> body = lambdaBody(kind);
 		return new Expr.Lambda(params, body);
 	}
 
@@ -436,7 +471,10 @@ public class Parser {
 	private Expr functional() {
 		Expr expr;
 		if (match(FUNC)) {
-			return lambdaBody("lambda");
+			if (match(IDENTIFIER)) {
+				Lox.error(previous(), "Lambda function cannot have a name.");
+			}
+			return nongetterFunction("lambda");
 
 		// } else if (match(FUNC)) {
 		// 	Token name = consume(IDENTIFIER, "Names are not allowed for anonymous functions.");
