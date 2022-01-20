@@ -3,8 +3,8 @@ package com.craftinginterpreters.jlox;
 import java.util.List;
 
 //* Collection of functions used to determine Lox language properties.
-public final class LoxProperties {
-	private LoxProperties() {}
+public final class LoxSemantics {
+	private LoxSemantics() {}
 	
 	//* Implicitly converts any object to a boolean.
 	public static boolean isTruthy(Object obj) {

@@ -736,16 +736,16 @@ public class Parser {
 
 		switch (operator.type) {
 			case MINUS:
-				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				LoxSemantics.checkNumberOperands(operator, left_lit.value, right_lit.value);
 				return new Expr.Literal((double) left_lit.value - (double) right_lit.value);
 
 			case PLUS:
 				if (left_lit.value instanceof String) {
-					return new Expr.Literal((String) left_lit.value + LoxProperties.stringify(right_lit.value));
+					return new Expr.Literal((String) left_lit.value + LoxSemantics.stringify(right_lit.value));
 				}
 
 				if (right_lit.value instanceof String) {
-					return new Expr.Literal(LoxProperties.stringify(left_lit.value) + (String) right_lit.value);
+					return new Expr.Literal(LoxSemantics.stringify(left_lit.value) + (String) right_lit.value);
 				}
 
 				if (left_lit.value instanceof Double && right_lit.value instanceof Double) {
@@ -753,36 +753,36 @@ public class Parser {
 				}
 			
 			case SLASH:
-				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				LoxSemantics.checkNumberOperands(operator, left_lit.value, right_lit.value);
 				if ((double) right_lit.value == 0)
 					Lox.error(operator, "Division by 0.");
 				return new Expr.Literal((double) left_lit.value / (double) right_lit.value);
 			
 			case STAR:
-				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				LoxSemantics.checkNumberOperands(operator, left_lit.value, right_lit.value);
 				return new Expr.Literal((double) left_lit.value * (double) right_lit.value);
 			
 			case LESSER:
-				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				LoxSemantics.checkNumberOperands(operator, left_lit.value, right_lit.value);
 				return new Expr.Literal((double) left_lit.value < (double) right_lit.value);
 			
 			case GREATER:
-				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				LoxSemantics.checkNumberOperands(operator, left_lit.value, right_lit.value);
 				return new Expr.Literal((double) left_lit.value > (double) right_lit.value);
 			
 			case LESSER_EQUAL:
-				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				LoxSemantics.checkNumberOperands(operator, left_lit.value, right_lit.value);
 				return new Expr.Literal((double) left_lit.value <= (double) right_lit.value);
 			
 			case GREATER_EQUAL:
-				LoxProperties.checkNumberOperands(operator, left_lit.value, right_lit.value);
+				LoxSemantics.checkNumberOperands(operator, left_lit.value, right_lit.value);
 				return new Expr.Literal((double) left_lit.value >= (double) right_lit.value);
 
 			case BANG_EQUAL:
-				return new Expr.Literal(LoxProperties.isEqual(left, right));
+				return new Expr.Literal(LoxSemantics.isEqual(left, right));
 
 			case EQUAL_EQUAL:
-				return new Expr.Literal(!LoxProperties.isEqual(left, right));
+				return new Expr.Literal(!LoxSemantics.isEqual(left, right));
 
 			// If we implement more operators, let them slide through and bundle them at the end
 			// This function will act as a passive optimization for the runtime
@@ -803,10 +803,10 @@ public class Parser {
 		// Expr.Literal right_lit = (Expr.Literal) right;
 		switch (operator.type) {
 			case AND:
-				if (!LoxProperties.isTruthy(left_lit.value))
+				if (!LoxSemantics.isTruthy(left_lit.value))
 					return left;
 			case OR:
-				if (LoxProperties.isTruthy(left_lit.value))
+				if (LoxSemantics.isTruthy(left_lit.value))
 						return left;
 			default:
 				break;
@@ -829,9 +829,9 @@ public class Parser {
 
 		switch (operator.type) {
 			case BANG:
-				return new Expr.Literal(!LoxProperties.isTruthy(left_lit.value));
+				return new Expr.Literal(!LoxSemantics.isTruthy(left_lit.value));
 			case MINUS:
-				LoxProperties.checkNumberOperand(operator, left_lit.value);
+				LoxSemantics.checkNumberOperand(operator, left_lit.value);
 				return new Expr.Literal(-(double) left_lit.value);
 			default:
 				break;

@@ -67,7 +67,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	@Override
 	public Void visitPrintStmt(Stmt.Print stmt) {
 		Object value = evaluate(stmt.expression);
-		System.out.println(LoxProperties.stringify(value));
+		System.out.println(LoxSemantics.stringify(value));
 		return null;
 	}
 
@@ -90,7 +90,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 	@Override
 	public Void visitIfStmt(Stmt.If stmt) {
-		if (LoxProperties.isTruthy(evaluate(stmt.condition))) {
+		if (LoxSemantics.isTruthy(evaluate(stmt.condition))) {
 			execute(stmt.thenBranch);
 		} else if (stmt.elseBranch != null) {
 			execute(stmt.elseBranch);
@@ -101,7 +101,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	@Override
 	public Void visitWhileStmt(Stmt.While stmt) {
 		try {
-			while (LoxProperties.isTruthy(evaluate(stmt.condition))) {
+			while (LoxSemantics.isTruthy(evaluate(stmt.condition))) {
 				execute(stmt.body);
 			}
 		} catch (Exception.Break error) {
@@ -126,7 +126,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			} else {
 				do {
 					execute(stmt.body);
-				} while (LoxProperties.isTruthy(evaluate(stmt.condition)));
+				} while (LoxSemantics.isTruthy(evaluate(stmt.condition)));
 			}
 
 		} catch (Exception.Break error) {
@@ -217,25 +217,25 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 		switch (expr.operator.type) {
 			case MINUS:
-				LoxProperties.checkNumberOperands(expr.operator, left, right);
+				LoxSemantics.checkNumberOperands(expr.operator, left, right);
 				return (double) left - (double) right;
 			case SLASH:
-				LoxProperties.checkNumberOperands(expr.operator, left, right);
+				LoxSemantics.checkNumberOperands(expr.operator, left, right);
 				if ((double) right == 0)
 					throw new Exception.Runtime(expr.operator, "Division by 0.");
 				return (double) left / (double) right;
 			case STAR:
-				LoxProperties.checkNumberOperands(expr.operator, left, right);
+				LoxSemantics.checkNumberOperands(expr.operator, left, right);
 				return (double) left * (double) right;
 
 			// Mathematical addition and string concatenation
 			case PLUS:
 				if (left instanceof String) {
-					return (String) left + LoxProperties.stringify(right);
+					return (String) left + LoxSemantics.stringify(right);
 				}
 
 				if (right instanceof String) {
-					return LoxProperties.stringify(left) + (String) right;
+					return LoxSemantics.stringify(left) + (String) right;
 				}
 
 				if (left instanceof Double && right instanceof Double) {
@@ -255,22 +255,22 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 				throw new Exception.Runtime(expr.operator, "Incompatible types for '+'.");
 
 			case LESSER:
-				LoxProperties.checkNumberOperands(expr.operator, left, right);
+				LoxSemantics.checkNumberOperands(expr.operator, left, right);
 				return (double) left < (double) right;
 			case GREATER:
-				LoxProperties.checkNumberOperands(expr.operator, left, right);
+				LoxSemantics.checkNumberOperands(expr.operator, left, right);
 				return (double) left > (double) right;
 			case LESSER_EQUAL:
-				LoxProperties.checkNumberOperands(expr.operator, left, right);
+				LoxSemantics.checkNumberOperands(expr.operator, left, right);
 				return (double) left <= (double) right;
 			case GREATER_EQUAL:
-				LoxProperties.checkNumberOperands(expr.operator, left, right);
+				LoxSemantics.checkNumberOperands(expr.operator, left, right);
 				return (double) left >= (double) right;
 
 			case EQUAL_EQUAL:
-				return LoxProperties.isEqual(left, right);
+				return LoxSemantics.isEqual(left, right);
 			case BANG_EQUAL:
-				return !LoxProperties.isEqual(left, right);
+				return !LoxSemantics.isEqual(left, right);
 
 			default:
 				break;
@@ -285,10 +285,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		Object left = evaluate(expr.left);
 
 		if (expr.operator.type == TokenType.OR) {
-			if (LoxProperties.isTruthy(left)) // b/c Lox is dynamically typed, look for truthiness and return that same truthiness.
+			if (LoxSemantics.isTruthy(left)) // b/c Lox is dynamically typed, look for truthiness and return that same truthiness.
 				return left; // If the entire expression can be determined, simply return it
 		} else { // AND
-			if (!LoxProperties.isTruthy(left))
+			if (!LoxSemantics.isTruthy(left))
 				return left;
 		}
 
@@ -319,10 +319,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 		switch (expr.operator.type) {
 			case MINUS:
-				LoxProperties.checkNumberOperand(expr.operator, right);
+				LoxSemantics.checkNumberOperand(expr.operator, right);
 				return -(double) right; // b/c lox is dynamically typed, we don't know if this cast will work or not
 			case BANG:
-				return !LoxProperties.isTruthy(right);
+				return !LoxSemantics.isTruthy(right);
 			default:
 				break;
 		}
@@ -400,7 +400,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	public Object visitTernaryExpr(Expr.Ternary expr) {
 		Object condition = evaluate(expr.left);
 
-		if (LoxProperties.isTruthy(condition)) {
+		if (LoxSemantics.isTruthy(condition)) {
 			return evaluate(expr.center);
 		} else {
 			return evaluate(expr.right);
