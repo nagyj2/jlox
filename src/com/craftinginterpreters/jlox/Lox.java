@@ -101,7 +101,7 @@ public class Lox {
 			report(token.line, " at '" + token.lexeme + "'", message);
 	}
 
-	static void runtimeError(RuntimeError error) {
+	static void runtimeError(Exception.Runtime error) {
 		System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
 		hadRuntimeError = true;
 	}

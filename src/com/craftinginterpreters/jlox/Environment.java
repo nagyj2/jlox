@@ -34,7 +34,7 @@ public class Environment {
 
 	void define(Token token, boolean constant, Object value) {
 		if (values.containsKey(token.lexeme) && values.get(token.lexeme).constant) {
-			throw new RuntimeError(token, "Cannot redefine constant.");
+			throw new Exception.Runtime(token, "Cannot redefine constant.");
 		}
 
 		Entry entry = new Entry(value, constant);
@@ -73,7 +73,7 @@ public class Environment {
 			Entry entry = values.get(name.lexeme);
 
 			if (entry.constant){
-				throw new RuntimeError(name, "Cannot redefine constant");
+				throw new Exception.Runtime(name, "Cannot redefine constant");
 			}
 
 			entry.change(value);
@@ -85,14 +85,14 @@ public class Environment {
 			return;
 		}
 
-		throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+		throw new Exception.Runtime(name, "Undefined variable '" + name.lexeme + "'.");
 	}
 
 	//* Assigns a value to a specific variable identified by a name and number of environments to skip.
 	void assignAt(int distance, Token token, Object value) {
 		Entry entry = ancestor(distance).retrieve(token);
 		if (entry.constant) {
-			throw new RuntimeError(token, "Cannot redefine constant");
+			throw new Exception.Runtime(token, "Cannot redefine constant");
 		}
 
 		entry.change(value);
@@ -115,7 +115,7 @@ public class Environment {
 			Entry value = values.get(token.lexeme);
 
 			if (errOnNil && value == null)
-				throw new RuntimeError(token, "Uninitialized variable '" + token.lexeme + "'.");
+				throw new Exception.Runtime(token, "Uninitialized variable '" + token.lexeme + "'.");
 			
 			return value;
 		}
@@ -123,6 +123,6 @@ public class Environment {
 		if (enclosing != null)
 			return enclosing.retrieve(token);
 
-		throw new RuntimeError(token, "Undefined variable '" + token.lexeme + "'.");
+		throw new Exception.Runtime(token, "Undefined variable '" + token.lexeme + "'.");
 	}
 }

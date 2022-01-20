@@ -28,14 +28,14 @@ public final class LoxProperties {
 	public static void checkNumberOperand(Token operator, Object operand) {
 		if (operand instanceof Double)
 			return;
-		throw new RuntimeError(operator, "Operand must be a number.");
+		throw new Exception.Runtime(operator, "Operand must be a number.");
 	}
 
 	//* Checks if both operands are a number.
 	public static void checkNumberOperands(Token operator, Object left, Object right) {
 		if (left instanceof Double && right instanceof Double)
 			return;
-		throw new RuntimeError(operator, "Operands must be a numbers.");
+		throw new Exception.Runtime(operator, "Operands must be a numbers.");
 	}
 
 	public static String stringify(Object object) {

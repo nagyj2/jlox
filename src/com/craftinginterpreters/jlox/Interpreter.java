@@ -32,10 +32,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			for (Stmt statement : statements) {
 				execute(statement);
 			}
-		} catch (RuntimeError error) {
+		} catch (Exception.Runtime error) {
 			Lox.runtimeError(error);
-		} catch (Break error) {
-			Lox.runtimeError(new RuntimeError(error.token, "Unexpected '" + error.token.lexeme + "' outside loop or 'do'."));
+		} catch (Exception.Break error) {
+			Lox.runtimeError(new Exception.Runtime(error.token, "Unexpected '" + error.token.lexeme + "' outside loop or 'do'."));
 		}
 	}
 	
@@ -104,7 +104,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			while (LoxProperties.isTruthy(evaluate(stmt.condition))) {
 				execute(stmt.body);
 			}
-		} catch (Break error) {
+		} catch (Exception.Break error) {
 			return null;
 		}
 
@@ -129,7 +129,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 				} while (LoxProperties.isTruthy(evaluate(stmt.condition)));
 			}
 
-		} catch (Break error) {
+		} catch (Exception.Break error) {
 			return null;
 		}
 
@@ -138,7 +138,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	
 	@Override
 	public Void visitBreakStmt(Stmt.Break stmt) {
-		throw new Break(stmt.token);
+		throw new Exception.Break(stmt.token);
 	}
 
 	@Override
@@ -148,7 +148,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			value = evaluate(stmt.value);
 		}
 
-		throw new Return(value);
+		throw new Exception.Return(value);
 	}
 
 	@Override
@@ -157,7 +157,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		if (stmt.superclass != null) {
 			superclass = evaluate(stmt.superclass);
 			if (!(superclass instanceof LoxClass))
-				throw new RuntimeError(stmt.superclass.name, "Superclass must be a class.");
+				throw new Exception.Runtime(stmt.superclass.name, "Superclass must be a class.");
 		}
 		
 		environment.define(stmt.name.lexeme, false, null); // Classes ARE NOT constant to allow recursion
@@ -205,7 +205,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		LoxFunction method = superclass.findMethod(expr.method.lexeme); // Find the method in the super
 
 		if (method == null)
-			throw new RuntimeError(expr.method, "Undefined property '" + expr.method.lexeme + "'.");
+			throw new Exception.Runtime(expr.method, "Undefined property '" + expr.method.lexeme + "'.");
 
 		return method.bind(object); // Bind the superclass' method to the current object
 	}
@@ -222,7 +222,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			case SLASH:
 				LoxProperties.checkNumberOperands(expr.operator, left, right);
 				if ((double) right == 0)
-					throw new RuntimeError(expr.operator, "Division by 0.");
+					throw new Exception.Runtime(expr.operator, "Division by 0.");
 				return (double) left / (double) right;
 			case STAR:
 				LoxProperties.checkNumberOperands(expr.operator, left, right);
@@ -252,7 +252,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 					return right;
 				}
 
-				throw new RuntimeError(expr.operator, "Incompatible types for '+'.");
+				throw new Exception.Runtime(expr.operator, "Incompatible types for '+'.");
 
 			case LESSER:
 				LoxProperties.checkNumberOperands(expr.operator, left, right);
@@ -366,14 +366,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 		// Protect against non-callables being called, like 3.14() or "hello"()
 		if (!(callee instanceof LoxCallable)) {
-			throw new RuntimeError(expr.paren, "Can only call functions and classes");
+			throw new Exception.Runtime(expr.paren, "Can only call functions and classes");
 		}
 
 		LoxCallable function = (LoxCallable) callee; // Cast to a callable and then invoke call. All callables are implement LoxCallable
 
 		// Check function arity. Raise error if not enough/ too many are passed
 		if (arguments.size() < function.arity()) {
-			throw new RuntimeError(expr.paren,
+			throw new Exception.Runtime(expr.paren,
 					"Expected " + function.arity() + " arguments but got " + arguments.size() + ".");
 		}
 
@@ -417,7 +417,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			return data;
 		}
 
-		throw new RuntimeError(expr.name, "Only instances have properties.");
+		throw new Exception.Runtime(expr.name, "Only instances have properties.");
 	}
 
 	@Override
@@ -425,7 +425,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		Object object = evaluate(expr.object);
 
 		if (!(object instanceof LoxInstance)) {
-			throw new RuntimeError(expr.name, "Only instances have fields.");
+			throw new Exception.Runtime(expr.name, "Only instances have fields.");
 		}
 
 		Object value = evaluate(expr.value);
@@ -439,18 +439,18 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		Object index = evaluate(expr.index);
 
 		if (!(index instanceof Double) && (Double) index % 1 == 0) {
-			throw new RuntimeError(expr.position, "Index must be an integer.");
+			throw new Exception.Runtime(expr.position, "Index must be an integer.");
 		}
 		int intdex = ((Double) index).intValue();
 
 		Object object = evaluate(expr.object);
 
 		if (!(object instanceof List)) {
-			throw new RuntimeError(expr.position, "Only lists can be indexed.");
+			throw new Exception.Runtime(expr.position, "Only lists can be indexed.");
 		}
 
 		if (intdex < 0 || intdex >= ((List<Object>) object).size()) {
-			throw new RuntimeError(expr.position, "Index out of bounds.");
+			throw new Exception.Runtime(expr.position, "Index out of bounds.");
 		}
 
 		return ((List<Object>) object).get(intdex);
@@ -462,18 +462,18 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 		Object index = evaluate(expr.index);
 
 		if (!(index instanceof Double) && (Double) index % 1 == 0) {
-			throw new RuntimeError(expr.position, "Index must be an integer.");
+			throw new Exception.Runtime(expr.position, "Index must be an integer.");
 		}
 		int intdex = ((Double) index).intValue();
 
 		Object object = evaluate(expr.object);
 
 		if (!(object instanceof List)) {
-			throw new RuntimeError(expr.position, "Only lists can be indexed.");
+			throw new Exception.Runtime(expr.position, "Only lists can be indexed.");
 		}
 
 		if (intdex < 0 || intdex >= ((List<Object>) object).size()) {
-			throw new RuntimeError(expr.position, "Index out of bounds.");
+			throw new Exception.Runtime(expr.position, "Index out of bounds.");
 		}
 
 		Object value = evaluate(expr.value);

@@ -22,7 +22,7 @@ public class LoxInstance {
 				return method.bind(this);
 		}
 
-		throw new RuntimeError(name, "Undefined property '" + name.lexeme + "'.");
+		throw new Exception.Runtime(name, "Undefined property '" + name.lexeme + "'.");
 	}
 
 	void set(Token name, Object value) {

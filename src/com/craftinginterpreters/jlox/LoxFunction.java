@@ -35,7 +35,7 @@ public class LoxFunction implements LoxCallable {
 		// Execute the function body in the new environment
 		try {
 			interpreter.executeBlock(declaration.body, environment);
-		} catch (Return returnValue) {
+		} catch (Exception.Return returnValue) {
 			if (isInitializer) // Force initializer to always return the instance
 				return closure.getAt(0, "this");
 			return returnValue.value;
