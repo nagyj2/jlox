@@ -17,7 +17,7 @@ letDecl         -> "let" IDENTIFIER "=" expression ";" ;
 funDecl         -> "let"? "fun" function;
 classDecl       -> "let"? "class" IDENTIFIER ( "<" IDENTIFIER )? "{" method* "}" ;
 function        -> IDENTIFIER "(" parameters? ")" block ;
-method          -> "class"? IDENTIFIER ( "(" parameters? ")" )? block ;
+method          -> ( "static" | "fun" ) IDENTIFIER ( "(" parameters? ")" )? block ;
 statement       -> block
                  | ifStmt
                  | whileStmt
@@ -34,7 +34,7 @@ doStmt          -> "do" statement ( "while" expression ";" )? ;
 forStmt         -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
 breakStmt       -> "break" ";" ;
 printStmt       -> "print" expr ";" ;
-returnStmt      -> "return expression? ";" ;
+returnStmt      -> "return" expression? ";" ;
 exprStmt        -> expression ";" ;
 expression      -> assignment ( "," assignment )*
                  | assignment "," ;

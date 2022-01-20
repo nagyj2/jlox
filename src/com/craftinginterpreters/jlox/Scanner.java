@@ -36,6 +36,7 @@ public class Scanner {
 		keywords.put("or", 			OR);
 		keywords.put("print", 	PRINT);
 		keywords.put("return",	RETURN);
+		keywords.put("static", 	STATIC);
 		keywords.put("super", 	SUPER);
 		keywords.put("this", 		THIS);
 		keywords.put("true", 		TRUE);
@@ -138,8 +139,8 @@ public class Scanner {
 				addToken(match('=') ? GREATER_EQUAL : GREATER);
 				break;
 			case '<':
-				// addToken(match('=') ? LESSER_EQUAL : match('-') ? LESSER_MINUS : LESSER);
-				addToken(match('=') ? LESSER_EQUAL : LESSER);
+				addToken(match('=') ? LESSER_EQUAL : match('-') ? LESSER_MINUS : LESSER);
+				// addToken(match('=') ? LESSER_EQUAL : LESSER);
 				break;
 			case '/':
 				// Special handling b/c single char is token and dual chars mean a comment

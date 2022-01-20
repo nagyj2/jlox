@@ -172,7 +172,7 @@ var a = "outer";
 // Classes
 
 class Animal {
-	speak() {
+	fun speak() {
 		print "I'm an animal!";
 	}
 }
@@ -183,17 +183,17 @@ var dog = animal;
 dog.speak();
 
 class Counter{
-	init(){
+	fun init(){
 		this.count = 0;
 		return;
 	}
 
-	inc(){
+	fun inc(){
 		this.count = this.count + 1;
 		return this.count;
 	}
 
-	inc2(){
+	fun inc2(){
 		this.inc(); this.inc();
 		return this.count;
 	}
@@ -219,7 +219,7 @@ counter.slip = false;
 print counter.slip;
 
 class Cake{
-	taste(){
+	fun taste(){
 		var adjective = "delicious";
 		print "This " + this.flavour + " cake is " + adjective + "!";
 	}
@@ -230,36 +230,36 @@ cake.flavour = "German Chocolate";
 cake.taste();
 
 class Node{
-	init(data){
+	fun init(data){
 		this._data = data;
 		this._next = nil;
 	}
 
-	next(){
+	fun next(){
 		return this._next;
 	}
 
-	data(){
+	fun data(){
 		return this._data;
 	}
 
-	setNext(data){
+	fun setNext(data){
 		this._next = Node(data);
 	}
 
-	delNext(){
+	fun delNext(){
 		this._next = nil;
 	}
 
 }
 
 class Vector{
-	init(){
+	fun init(){
 		this.size = 0;
 		this.head = nil;
 	}
 
-	append(data){
+	fun append(data){
 		if (this.size == 0){
 			this.head = Node(data);
 			this.size = this.size + 1;
@@ -276,7 +276,7 @@ class Vector{
 		return this;
 	}
 
-	shrink(){
+	fun shrink(){
 		if (this.size <= 1){
 			this.head = nil;
 			this.size = 0;
@@ -293,7 +293,7 @@ class Vector{
 		return this;
 	}
 
-	search(key){
+	fun search(key){
 
 		for (var node = this.head; node != nil; node = node.next()){
 			if (node.data() == key){
@@ -304,7 +304,7 @@ class Vector{
 		return false;
 	}
 
-	str(){
+	fun str(){
 		var string = "[";
 
 		if (this.size == 0)
@@ -346,13 +346,13 @@ print vector.str();
 // Inheritance
 
 class Doughnut{
-	cook(){
+	fun cook(){
 		print "Fry until golden brown";
 	}
 }
 
 class BostonCream < Doughnut {
-	cook(){
+	fun cook(){
 		super.cook();
 		print "Pipe full of custard and coat with chocolate.";
 	}
@@ -362,16 +362,16 @@ Doughnut().cook();
 BostonCream().cook();
 
 class A{
-	method(){
+	fun method(){
 		print "Method A";
 	}
 }
 
 class B < A{
-	method(){
+	fun method(){
 		print "Method B";
 	}
-	test(){
+	fun test(){
 		super.method();
 	}
 }
@@ -605,13 +605,13 @@ print "Vector.whoami(): " + Vector.whoami();
 // print "vector.whoami(): " + vector.whoami(); //< Error! function was added to Vector class
 
 class MathConst{
-	whoami(){return "MathConst";}
-	class pi(){return 3.14;}
-	class e(){return 2.718;}
-	class g(){return 9.8;}
-	class goldenRatio(){return 1.618;}
-	class sqrt2(){return 1.414;}
-	class sqrt3(){return 1.732;}
+	fun whoami(){return "MathConst";}
+	static pi(){return 3.14;}
+	static e(){return 2.718;}
+	static g(){return 9.8;}
+	static goldenRatio(){return 1.618;}
+	static sqrt2(){return 1.414;}
+	static sqrt3(){return 1.732;}
 }
 
 print "pi = " + MathConst.pi();
@@ -624,7 +624,7 @@ print "I am a " + mc.whoami();
 // Getters
 
 class A{
-	say {
+	fun say {
 		print "aaa";
 	}
 }
@@ -730,7 +730,7 @@ a /= 3;
 print "2 : " + a;
 
 class F{
-	init(){
+	fun init(){
 		this.a = 0;
 	}
 }
@@ -762,8 +762,8 @@ print "a2 : " + a[0];
 // Constant Function and Class name binding
 
 let class Math{
-	class pi { return 3.1415; }
-	class e  { return 2.7182; }
+	static pi { return 3.1415; }
+	static e  { return 2.7182; }
 }
 
 print Math.e + Math.pi;
@@ -774,8 +774,11 @@ print Math.e + Math.pi;
 Math.goldenRatio = 1.618; // Math variable is constant, not the class
 print Math.goldenRatio;
 
+let fun min(a,b){
+	return b;
+}
 
-let fun min (a, b) {
+fun min ( a , b) {
 	if (a < b) return a;
 	return b;
 }
@@ -784,3 +787,26 @@ let fun min (a, b) {
 // let min = 23; //< Error!
 
 print "Completed sample.xlox!";
+
+
+let fun AAAA(AA, BB, CC){
+	return "AAA";
+}
+fun AAAA(AA, BB, CC){
+	return "AAA";
+}
+
+class AAAA <- A {
+	fun init(a, b) {}
+	fun AAA {}
+	fun AAA(a, b) {}
+	static AAA {}
+	static AAA() {}
+}
+let class AAAA <- A {
+	fun init(a, b) {}
+	fun AAA {}
+	fun AAA(a, b) {}
+	static AAA {}
+	static AAA() {}
+}

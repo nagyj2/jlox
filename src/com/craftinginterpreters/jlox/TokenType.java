@@ -27,7 +27,7 @@ enum TokenType {
 	GREATER_EQUAL, // >=
 	LESSER, // <
 	LESSER_EQUAL, // <=
-	// LESSER_MINUS, // <-
+	LESSER_MINUS, // <-
 	PLUS_PLUS, // ++
 	MINUS_MINUS, // --
 	STAR_EQUAL, // *=
@@ -55,6 +55,7 @@ enum TokenType {
 	OR,
 	PRINT,
 	RETURN,
+	STATIC,
 	SUPER,
 	THIS,
 	TRUE,

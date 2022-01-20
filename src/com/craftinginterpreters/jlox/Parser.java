@@ -22,6 +22,8 @@ public class Parser {
              | call ;
 	 */
 
+	final boolean compatibility = true; // Enables compatibility mode for lox
+
 	public Parser(List<Token> tokens, boolean isREPL) {
 		this.tokens = tokens;
 		this.isREPL = isREPL;
@@ -106,7 +108,7 @@ public class Parser {
 		// 	consume(SEMICOLON, "Expected ';' after variable declaration.");
 		// 	return varDecl;
 		// } else {
-		return new Stmt.Function(name, constant, (Expr.Lambda) lambdaBody("static method")); // methods inheret from the class
+		return new Stmt.Function(name, constant, (Expr.Lambda) lambdaBody(kind)); // methods inheret from the class
 		// }
 	}
 	
@@ -141,7 +143,7 @@ public class Parser {
 		Token name = consume(IDENTIFIER, "Expected class name.");
 
 		Expr.Variable superclass = null;
-		if (match(LESSER)) {
+		if (match(LESSER_MINUS) || (compatibility && match(LESSER))) {
 			consume(IDENTIFIER, "Expected superclass name.");
 			superclass = new Expr.Variable(previous());
 		}
@@ -154,17 +156,15 @@ public class Parser {
 		// List<Stmt.Var> classvar     = new ArrayList<>();
 
 		while (!check(RIGHT_CURLY) && !isAtEnd()) {
-			if (match(CLASS)) {
-				// if (match(VAR)) {
-				// 	Stmt declaration = varDeclaration();
-				// 	staticvars.add((Stmt.Var) declaration);
-				// } else {
-				// }
+			if (match(STATIC)) {
 				Stmt.Function declaration = (Stmt.Function) methodDeclaration("static method", constant);
 				statics.add((Stmt.Function) declaration);
-			} else {
+			} else if (match(FUNC) || (compatibility && peek().type == IDENTIFIER)) {
 				Stmt.Function declaration = (Stmt.Function) methodDeclaration("method", constant);
 				methods.add((Stmt.Function) declaration);
+			} else {
+				Lox.error(previous(), "Expected 'static' or 'fun'.");
+				advance();
 			}
 		}
 		consume(RIGHT_CURLY, "Expected '}' after class body.");
