@@ -61,17 +61,21 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 	}
 
 	//* Opens a new scope
-	private void beginScope() {
+	private void beginScope(String kind) {
 		scopes.push(new HashMap<String, Boolean>());
+		Lox.writer.newScope(kind);
 	}
 
 	//* Closes the current scope
 	private void endScope() {
-		scopes.pop();
+		Map<String, Boolean> scope = scopes.pop();
+
+		Lox.writer.endScope(scope);
 	}
 
 	//* Declares a variable by adding it to the scopes. This is done before initialization so that it will shadow any other variables with the same name when determining initialization.
 	private void declare(Token name) {
+		Lox.writer.declareVar(name.lexeme);
 		if (scopes.isEmpty()) {
 			return;
 		}
@@ -102,6 +106,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		for (int i = scopes.size() - 1; i >= 0; i--) {
 			if (scopes.get(i).containsKey(name.lexeme)) {
 				interpreter.resolve(expr, scopes.size() - 1 - i);
+				Lox.writer.resolveVar(name.lexeme, scopes.size() - 1 - i);
 				return;
 			}
 		}
@@ -114,7 +119,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		FunctionType enclosingFunction = currentFunction; // save current enclosing function
 		currentFunction = type; // Update current 'within-a-function' state
 
-		beginScope(); // New scope for function body
+		beginScope("lambda"); // New scope for function body
 		if (lambda.params != null) {
 			for (Token param : lambda.params) {
 				declare(param); // Define and initialize parameters
@@ -133,7 +138,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
 	@Override
 	public Void visitBlockStmt(Stmt.Block stmt) {
-		beginScope(); // Open a scope
+		beginScope("block"); // Open a scope
 		resolve(stmt.statements); // Traverse AST, adding to current scope
 		endScope(); // Discard current scope
 		return null;
@@ -175,16 +180,16 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 				Lox.error(stmt.superclass.name, "A class cannot inherit from itself.");
 
 			resolve(stmt.superclass);
-		}
 
 		// Add super to the environment of the class. Create it as a layer between the outer scope and class methods scope so it will catch
-		if (stmt.superclass != null) {
-			beginScope();
+			beginScope("superclass " + stmt.superclass.name.lexeme);
 			scopes.peek().put("super", true);
+			Lox.writer.declareVar("super");
 		}
 
-		beginScope(); // Open a scope for the class
+		beginScope("class " + stmt.name.lexeme); // Open a scope for the class
 		scopes.peek().put("this", true); // Insert 'this' into the scope b/c it isnt declared anywhere
+		Lox.writer.declareVar("this");
 		
 		for (Stmt.Function method : stmt.staticmethods) {
 			FunctionType declaration = FunctionType.METHOD;

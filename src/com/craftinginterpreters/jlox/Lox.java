@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 
 import java.util.List;
 
+import com.craftinginterpreters.tool.DebugWriter;
+
 public class Lox {
 
 	private static final Interpreter interpreter = new Interpreter();
@@ -17,6 +19,8 @@ public class Lox {
 	// Whether an error occured during execution.
 	static boolean hadError = false;
 	static boolean hadRuntimeError = false;
+
+	static DebugWriter writer;
 
 	public static void main(String[] args) throws IOException {
 		if (args.length > 1) {
@@ -75,8 +79,10 @@ public class Lox {
 		if (hadError)
 			return;
 
+		writer = new DebugWriter();
 		Resolver resolver = new Resolver(interpreter);
 		resolver.resolve(statements);
+		writer.close();
 
 		if (hadError)
 			return;
