@@ -364,6 +364,11 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
 	@Override
 	public Void visitLiteralExpr(Expr.Literal expr) {
+		if (expr.value instanceof List) {
+			for (Expr elem : (List<Expr>) expr.value) {
+				resolve(elem);
+			}
+		}
 		return null;
 	}
 
