@@ -632,8 +632,8 @@ class A{
 var a = A();
 a.say;
 
-a.shout = fun { print "AAA!"; };
-a.shout;
+// a.shout = fun { print "AAA!"; }; // not permitted anymore...
+// a.shout;
 
 // Constant Folding
 
@@ -683,12 +683,12 @@ jeb[4]();
 
 // Appending and Prepending
 
-print [1,2,3,4] + 5;
-print [] + 5;
-print 5 + [1,2,3,4];
-print 5 + [];
+print [1,2,3,4] ++ 5;
+print [] ++ 5;
+print 5 ++ [1,2,3,4];
+print 5 ++ [];
 
-print 1 + [] + 2;
+print 1 ++ [] ++ 2;
 
 /* Prefix Operations (Deactivated by default)
  * 
@@ -810,3 +810,7 @@ let class AAAA <- A {
 	static AAA {}
 	static AAA() {}
 }
+
+var f = [] ++ [] ++ [];
+
+print f;

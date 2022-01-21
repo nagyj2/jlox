@@ -556,16 +556,37 @@ public class Parser {
 
 	//* Parse an equality (== or !=) expression.
 	private Expr equality() {
-		Expr expr = comparison();
+		Expr expr = append();
 
 		while (match(BANG_EQUAL, EQUAL_EQUAL)) {
 			Token operator = previous();
-			
+
 			if (!isPrimaryNext()) {
 				error(isAtEnd() ? peek() : previous(), "Expected second operand.");
 				return expr;
 			}
-			
+
+			Expr right = append();
+			// expr = new Expr.Binary(operator, expr, right);
+			expr = foldBinary(operator, expr, right);
+		}
+
+		return expr;
+	}
+	
+
+	//* Parse a appending (++) expression. Allow math to be done without parentheses
+	private Expr append() {
+		Expr expr = comparison();
+
+		while (match(PLUS_PLUS)) {
+			Token operator = previous();
+
+			if (!isPrimaryNext()) {
+				error(isAtEnd() ? peek() : previous(), "Expected second operand.");
+				return expr;
+			}
+
 			Expr right = comparison();
 			// expr = new Expr.Binary(operator, expr, right);
 			expr = foldBinary(operator, expr, right);

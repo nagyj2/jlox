@@ -244,6 +244,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 					return (double) left + (double) right;
 				}
 
+				throw new Exception.Runtime(expr.operator, "Addition requires 2 numbers or at least one string.");
+
+			case PLUS_PLUS:
 				if (left instanceof List) {
 					((List<Object>) left).add(right);
 					return left;
@@ -254,7 +257,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 					return right;
 				}
 
-				throw new Exception.Runtime(expr.operator, "Incompatible types for '+'.");
+				throw new Exception.Runtime(expr.operator, "Appending requires at least one list.");
 
 			case LESSER:
 				LoxSemantics.checkNumberOperands(expr.operator, left, right);

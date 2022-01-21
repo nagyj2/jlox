@@ -50,8 +50,10 @@ logic_or        -> logic_and ( "or" logic_and )*
                  | logic_and "or ;
 logic_and       -> equality ( "and" equality )* 
                  | equality "and" ;
-equality        -> comparison ( ( "==" | "!=" ) comparison )* 
-                 | comparison ( "==" | "!=" ) ;
+equality        -> append ( ( "==" | "!=" ) append )* 
+                 | append ( "==" | "!=" ) ;
+append          -> comparison ( "++" comparison )* 
+                 | comparison ( "++" ) ;
 comparison      -> term ( ( ">" | ">=" | "<" | "<=" ) term )* 
                  | term ( ">" | ">=" | "<" | "<=" );
 term            -> factor ( ( "+" | "-" ) factor )* 
