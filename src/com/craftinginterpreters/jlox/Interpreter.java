@@ -24,6 +24,72 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 				return (double) System.currentTimeMillis() / 1000.0; // Retuns the current time in seconds.
 			}
 		});
+
+		globals.define("str", true, new LoxCallable() {
+			@Override
+			public int arity() { return 1; }
+
+			@Override
+			public Object call(Interpreter interpreter, List<Object> arguments) {
+				return LoxSemantics.stringify(arguments.get(0)); // Retuns the current time in seconds.
+			}
+		});
+
+		globals.define("assert", true, new LoxCallable() {
+			@Override
+			public int arity() { return 1; }
+
+			@Override
+			public Object call(Interpreter interpreter, List<Object> arguments) {
+				if (LoxSemantics.isTruthy(arguments.get(0))) {
+					return null;
+				} else {
+					throw new Exception.FailedAssertion(arguments.get(0), true, "==");
+				}
+			}
+		});
+
+		globals.define("assertFalse", true, new LoxCallable() {
+			@Override
+			public int arity() { return 1; }
+
+			@Override
+			public Object call(Interpreter interpreter, List<Object> arguments) {
+				if (!LoxSemantics.isTruthy(arguments.get(0))) {
+					return null;
+				} else {
+					throw new Exception.FailedAssertion(arguments.get(0), false, "==");
+				}
+			}
+		});
+
+		globals.define("assertEqual", true, new LoxCallable() {
+			@Override
+			public int arity() { return 2; }
+
+			@Override
+			public Object call(Interpreter interpreter, List<Object> arguments) {
+				if (LoxSemantics.isEqual(arguments.get(0), arguments.get(1))) {
+					return null;
+				} else {
+					throw new Exception.FailedAssertion(arguments.get(0), arguments.get(1), "==");
+				}
+			}
+		});
+
+		globals.define("assertNotEqual", true, new LoxCallable() {
+			@Override
+			public int arity() { return 2; }
+
+			@Override
+			public Object call(Interpreter interpreter, List<Object> arguments) {
+				if (!LoxSemantics.isEqual(arguments.get(0), arguments.get(1))) {
+					return null;
+				} else {
+					throw new Exception.FailedAssertion(arguments.get(0), arguments.get(1), "!=");
+				}
+			}
+		});
 	}
 	
 	//* Start the evaluation of a program.
@@ -34,11 +100,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			}
 		} catch (Exception.Runtime error) {
 			Lox.runtimeError(error);
-		} catch (Exception.Break error) {
-			Lox.runtimeError(new Exception.Runtime(error.token, "Unexpected '" + error.token.lexeme + "' outside loop or 'do'."));
-		} catch (Exception.Panic error) {
-			Lox.runtimeError(error);
-		} catch (Exception.Generic error) {
+		} catch (Exception error) {
 			Lox.runtimeError(error);
 		}
 	}
@@ -218,7 +280,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 	
 	@Override
 	public Void visitPanicStmt(Stmt.Panic stmt) {
-		throw new Exception.Panic(stmt.code, "Uncaught panic: Code " + stmt.code);
+		throw new Exception.Panic(stmt.code);
 	}
 
 	//~ Expression Evaluation

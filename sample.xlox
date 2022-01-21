@@ -872,5 +872,32 @@ try {
 	print "catch all";
 } 
 
+// Added string function and assertion
+
+assert(true);
+assert(7);
+assert(0);
+assert("Hello");
+assert("");
+assert([1,2,3]);
+assert([]);
+
+assertFalse(false);
+assertFalse(nil);
+
+assertEqual(1, 1);
+assertEqual("Hi", "Hi");
+assertEqual(true, true);
+assertEqual(nil, nil);
+
+assertNotEqual(1, 3);
+assertNotEqual(1, "1");
+assertNotEqual([], false);
+assertNotEqual(false, true);
+assertNotEqual(nil, false);
+assertNotEqual(nil, true);
+
+print str(1);
+
 
 print "Completed sample.xlox!";

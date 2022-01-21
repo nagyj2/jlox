@@ -116,12 +116,13 @@ arguments       -> assignment ( "," assignment )* ;
   - Returns the element being removed
 - Try/ catch
   - Operated off of panic statements and corresponding numeric codes
+- Assertions
+  - assert true, false, equals and not equals
 
 #### Desired Modifications
 
 - Module system
 - Maps
-- assertions
 - Ternary << operator
 - Standard Library
   - xlox Implemented

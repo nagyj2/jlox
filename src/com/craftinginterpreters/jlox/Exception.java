@@ -9,7 +9,7 @@ abstract class Exception extends RuntimeException {
 		final Token token;
 
 		public Break(Token token) {
-			super("Uncaught break."); // Used for control flow, so lighten the overhead
+			super("Unexpected '" + token.lexeme + "' outside loop or 'do'."); // Used for control flow, so lighten the overhead
 			this.token = token;
 		}
 	}
@@ -18,7 +18,7 @@ abstract class Exception extends RuntimeException {
 		final Object value;
 		
 		public Return(Object value) {
-			super("Uncaught return.");
+			super("Unexpected return outside function.");
 			this.value = value;
 		}
 	}
@@ -42,9 +42,20 @@ abstract class Exception extends RuntimeException {
 	static class Panic extends Exception {
 		final Double code;
 
-		public Panic(Double code, String message) {
-			super(message);
+		public Panic(Double code) {
+			super("Uncaught panic: Code " + code);
 			this.code = code;
+		}
+	}
+
+	static class FailedAssertion extends Exception {
+		final Object left;
+		final Object right;
+
+		public FailedAssertion(Object left, Object right, String op) {
+			super("Failed assertion. Expected " + LoxSemantics.stringify(left) + " " + op + " " + LoxSemantics.stringify(right) + ".");
+			this.left = left;
+			this.right = right;
 		}
 	}
 }

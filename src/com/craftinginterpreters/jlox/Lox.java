@@ -112,12 +112,7 @@ public class Lox {
 		hadRuntimeError = true;
 	}
 
-	static void runtimeError(Exception.Generic error) {
-		System.err.println(error.getMessage());
-		hadRuntimeError = true;
-	}
-
-	static void runtimeError(Exception.Panic error) {
+	static void runtimeError(Exception error) {
 		System.err.println(error.getMessage());
 		hadRuntimeError = true;
 	}
