@@ -811,6 +811,23 @@ let class AAAA <- A {
 	static AAA() {}
 }
 
-var f = [] ++ [] ++ [];
+
+// List removal
+
+var f = [] ++ 1 ++ 2 ++ 3 ++ 4 ++ 5;
 
 print f;
+
+var r = --f; // catch removed
+
+print f;
+print r;
+
+r = f--; // catch removed
+
+print f;
+print r;
+
+// f--;
+
+// print f;

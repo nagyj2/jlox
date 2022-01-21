@@ -60,8 +60,11 @@ term            -> factor ( ( "+" | "-" ) factor )*
                  | factor ( "+" | "-" ) ;
 factor          -> unary ( ( "*" | "/" ) unary )* 
                  | unary ( "*" | "/" ) ;
-unary           -> ( "!" | "-" ) unary 
-                 | call ;
+unary           -> ( "!" | "-" )* prefix
+                 | prefix ;
+prefix          -> ( "--" ) postfix
+                 | postfix ; 
+postfix         -> call ( "--" ) ;
 call            -> primary ( "(" arguments? ")" | "." IDENTIFIER | "[" assignment "]" )* ;   
 primary         -> NUMBER
                  | STRING
@@ -99,11 +102,13 @@ arguments       -> assignment ( "," assignment )* ;
   - Indexable and assignable
   - Nestable
   - Can hold arbitrary length and type
-  - Appending and prepending with '+' (may change to '++')
+  - Appending and prepending with '++'
 - Shorthand assignments
 - Constant function and class name binding
   - Once a function or class has been bound to a variable, it cannot be rebound
   - Note: The class itself can still be modified
+- Added list element removal with unary operator "--"
+  - Returns the element being removed
 
 #### Desired Modifications
 

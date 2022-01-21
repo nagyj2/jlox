@@ -17,6 +17,13 @@ public class Token {
 		this.line = line;
 	}
 
+	Token(TokenType type, Token other) {
+		this.type = type;
+		this.lexeme = other.lexeme;
+		this.literal = other.literal;
+		this.line = other.line;
+	}
+
 	public String toString() {
 		return type + " " + lexeme + " " + literal;
 	}

@@ -328,6 +328,23 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 				return -(double) right; // b/c lox is dynamically typed, we don't know if this cast will work or not
 			case BANG:
 				return !LoxSemantics.isTruthy(right);
+			case MINUS_MINUS:
+			case MINUS_MINUS_POST:
+				if (right instanceof List) {
+					List<Object> list = (List<Object>) right;
+					if (list.size() == 0)
+						throw new Exception.Runtime(expr.operator, "Cannot remove from empty list");
+					Object removed;
+					if (expr.operator.type == TokenType.MINUS_MINUS)
+						removed = list.remove(0);
+					else
+						removed = list.remove(list.size() - 1);
+					return removed; // return popped element
+					// return right; // return list
+				}
+
+				return new Exception.Runtime(expr.operator, "Remove operator requires a list.");
+
 			default:
 				break;
 		}

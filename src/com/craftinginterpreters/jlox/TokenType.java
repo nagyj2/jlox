@@ -30,6 +30,7 @@ enum TokenType {
 	LESSER_MINUS, // <-
 	PLUS_PLUS, // ++
 	MINUS_MINUS, // --
+	MINUS_MINUS_POST, // -- // Operator for postfix removal
 	STAR_EQUAL, // *=
 	SLASH_EQUAL, // /=
 	MINUS_EQUAL, // -=

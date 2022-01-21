@@ -670,30 +670,43 @@ public class Parser {
 	//* Parse a prefix expression.
 	private Expr prefix() {
 
-		if (usePrefixes){
-			if (match(MINUS_MINUS, PLUS_PLUS)) {
-				Token operator = previous();
-				Expr expr = call();
+		if (match(MINUS_MINUS)) {
+			Token operator = previous();
+			Expr expr = postfix(); // change to 'prefix' for arbitrary amount of pops
 
-				if (expr instanceof Expr.Variable) {
-					Expr.Variable variable = (Expr.Variable) expr;
+			// if (expr instanceof Expr.Variable) {
+			// 	Expr.Variable variable = (Expr.Variable) expr;
 
-					Expr adjustment = new Expr.Assign(variable.name,
-							new Expr.Binary(
-									new Token(operator.type == MINUS_MINUS ? MINUS : PLUS, operator.lexeme, operator.literal,
-											operator.line),
-									(Expr) new Expr.Variable(variable.name),
-									(Expr) new Expr.Literal((double) 1)));
+			// 	Expr adjustment = new Expr.Assign(variable.name,
+			// 			new Expr.Binary(
+			// 					new Token(operator.type == MINUS_MINUS ? MINUS : PLUS, operator.lexeme, operator.literal,
+			// 							operator.line),
+			// 					(Expr) new Expr.Variable(variable.name),
+			// 					(Expr) new Expr.Literal((double) 1)));
 
-					expr = new Expr.Sequence(adjustment, variable);
-				}
-				return expr;
-			}
-			// return new Expr.Unary(operator, right);
-			// return foldUnary(operator, expr);
+			// 	expr = new Expr.Sequence(adjustment, variable);
+			// }
+			// return expr;
+			return new Expr.Unary(operator, expr);
 		}
+		// return foldUnary(operator, expr);
 
-		return call();
+		return postfix();
+	}
+
+	//* Parse a postfix expression.
+	private Expr postfix() {
+
+		Expr expr = call();
+
+		// change to 'while' for arbitrary amount of pops
+		if (match(MINUS_MINUS)) {
+			Token newop = new Token(MINUS_MINUS_POST, previous()); // declare -- as postfix version
+			expr = new Expr.Unary(newop, expr);
+		}
+		// return foldUnary(operator, expr);
+
+		return expr;
 	}
 
 	//* Parse a call expression.
