@@ -1,6 +1,7 @@
 package com.craftinginterpreters.jlox;
 
 import java.util.List;
+import java.util.Map;
 
 abstract class Expr {
 	interface Visitor<R> {

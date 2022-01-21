@@ -45,8 +45,10 @@ public class GenerateAST {
 				"Expression : Expr expression",
 				"Function   : Token name, boolean constant, Expr.Lambda lambda",
 				"If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
+				"Panic      : Token keyword, Double code",
 				"Print      : Expr expression",
 				"Return     : Token keyword, Expr value",
+				"Try        : Token keyword, Stmt body, Map<Double|Stmt> catches",
 				"Var        : Token name, boolean constant, Expr initializer",
 				"While      : Expr condition, Stmt body"
 		));
@@ -60,6 +62,7 @@ public class GenerateAST {
 		writer.println("package com.craftinginterpreters.jlox;");
 		writer.println();
 		writer.println("import java.util.List;");
+		writer.println("import java.util.Map;");
 		writer.println();
 
 		// The base class
@@ -102,12 +105,12 @@ public class GenerateAST {
 		// Fields
 		if (!fields[0].isEmpty()) {
 			for (String field : fields) {
-				writer.println("		final " + field + ";");
+				writer.println("		final " + field.replace('|', ',') + ";");
 			}
 			writer.println();
 
 			// Constructor
-			writer.println("		" + className + "(" + fieldList + ") {");
+			writer.println("		" + className + "(" + fieldList.replace('|', ',') + ") {");
 			for (String field : fields) { // Store parameters into the fields
 				String name = field.split(" ")[1];
 				writer.println("			this." + name + " = " + name + ";");

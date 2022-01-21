@@ -1,6 +1,7 @@
 package com.craftinginterpreters.jlox;
 
 import java.util.List;
+import java.util.Map;
 
 abstract class Stmt {
 	interface Visitor<R> {
@@ -11,8 +12,10 @@ abstract class Stmt {
 		R visitExpressionStmt(Expression stmt);
 		R visitFunctionStmt(Function stmt);
 		R visitIfStmt(If stmt);
+		R visitPanicStmt(Panic stmt);
 		R visitPrintStmt(Print stmt);
 		R visitReturnStmt(Return stmt);
+		R visitTryStmt(Try stmt);
 		R visitVarStmt(Var stmt);
 		R visitWhileStmt(While stmt);
 	}
@@ -128,6 +131,21 @@ abstract class Stmt {
 		}
 	}
 
+	static class Panic extends Stmt {
+		final Token keyword;
+		final Double code;
+
+		Panic(Token keyword, Double code) {
+			this.keyword = keyword;
+			this.code = code;
+		}
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitPanicStmt(this);
+		}
+	}
+
 	static class Print extends Stmt {
 		final Expr expression;
 
@@ -153,6 +171,23 @@ abstract class Stmt {
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitReturnStmt(this);
+		}
+	}
+
+	static class Try extends Stmt {
+		final Token keyword;
+		final Stmt body;
+		final Map<Double,Stmt> catches;
+
+		Try(Token keyword, Stmt body, Map<Double,Stmt> catches) {
+			this.keyword = keyword;
+			this.body = body;
+			this.catches = catches;
+		}
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitTryStmt(this);
 		}
 	}
 

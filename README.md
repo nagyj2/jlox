@@ -26,6 +26,8 @@ statement       -> block
                  | breakStmt
                  | printStmt
                  | returnStmt
+                 | tryStmt
+                 | panicStmt
                  | exprStmt ;
 block           -> "{" declarations* "}" ;
 ifStmt          -> "if" "(" expression ")" statement ( "else" statement )? ;
@@ -35,6 +37,9 @@ forStmt         -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expres
 breakStmt       -> "break" ";" ;
 printStmt       -> "print" expr ";" ;
 returnStmt      -> "return" expression? ";" ;
+tryStmt         -> "try" "{" declarations* "}" catchClause+ ;
+catchClause     -> "catch" ( NUMBER )? "{" declarations* "}" ;
+panicStmt       -> "panic" NUMBER ;
 exprStmt        -> expression ";" ;
 expression      -> assignment ( "," assignment )*
                  | assignment "," ;
@@ -109,10 +114,15 @@ arguments       -> assignment ( "," assignment )* ;
   - Note: The class itself can still be modified
 - Added list element removal with unary operator "--"
   - Returns the element being removed
+- Try/ catch
+  - Operated off of panic statements and corresponding numeric codes
 
 #### Desired Modifications
 
 - Module system
+- Maps
+- assertions
+- Ternary << operator
 - Standard Library
   - xlox Implemented
   - Native Functions to extend xlox capability (Java implemented)

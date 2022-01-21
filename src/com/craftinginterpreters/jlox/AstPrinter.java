@@ -1,5 +1,6 @@
 package com.craftinginterpreters.jlox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Implements the Visitor interface, so it requries accept methods for each type.
@@ -242,6 +243,16 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 		}
 		builder.append("}");
 		return builder.toString();
+	}
+
+	@Override
+	public String visitPanicStmt(Stmt.Panic stmt) {
+		return "(panic " + stmt.code + ")";
+	}
+
+	@Override
+	public String visitTryStmt(Stmt.Try stmt) {
+		return "(try " + encase(new ArrayList<Stmt>(stmt.catches.values())) + ")";
 	}
 
 }

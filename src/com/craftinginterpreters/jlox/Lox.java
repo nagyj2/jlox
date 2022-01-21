@@ -117,6 +117,11 @@ public class Lox {
 		hadRuntimeError = true;
 	}
 
+	static void runtimeError(Exception.Panic error) {
+		System.err.println(error.getMessage());
+		hadRuntimeError = true;
+	}
+
 	//* Reports an error to stderr with the line number, message and a position.
 	private static void report(int line, String where, String message) {
 		System.err.println("[line " + line + "] Error" + where + ": " + message);

@@ -786,8 +786,6 @@ fun min ( a , b) {
 // min = 45; //< Error!
 // let min = 23; //< Error!
 
-print "Completed sample.xlox!";
-
 
 let fun AAAA(AA, BB, CC){
 	return "AAA";
@@ -828,3 +826,51 @@ r = f--; // catch removed
 print f;
 print r;
 
+// Panics
+
+try {
+	panic 1;
+} catch 1 {
+	print "caught 1";
+}
+
+try {
+	panic 2;
+} catch 1 {
+	print "caught 1";
+} catch 2 {
+	print "caught 2";
+}
+
+try {
+	panic;
+} catch {
+	print "catch all";
+} 
+
+try {
+	panic;
+} catch 1 {
+	print "caught 1";
+} catch {
+	print "catch all";
+} 
+
+try {
+	panic 1;
+} catch 1 {
+	print "caught 1";
+} catch {
+	print "catch all";
+} 
+
+try {
+	panic 2;
+} catch 1 {
+	print "caught 1";
+} catch {
+	print "catch all";
+} 
+
+
+print "Completed sample.xlox!";

@@ -36,6 +36,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			Lox.runtimeError(error);
 		} catch (Exception.Break error) {
 			Lox.runtimeError(new Exception.Runtime(error.token, "Unexpected '" + error.token.lexeme + "' outside loop or 'do'."));
+		} catch (Exception.Panic error) {
+			Lox.runtimeError(error);
 		} catch (Exception.Generic error) {
 			Lox.runtimeError(error);
 		}
@@ -161,14 +163,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			if (!(superclass instanceof LoxClass))
 				throw new Exception.Runtime(stmt.superclass.name, "Superclass must be a class.");
 		}
-		
+
 		environment.define(stmt.name.lexeme, false, null); // Classes ARE NOT constant to allow recursion
-		
+
 		if (stmt.superclass != null) {
-				environment = new Environment(environment); // b/c we added a scope in the resolver, we need this new scope to insert super
-				environment.define("super", true, superclass); // Disallow altering super. May change going forward?
-			}
-		
+			environment = new Environment(environment); // b/c we added a scope in the resolver, we need this new scope to insert super
+			environment.define("super", true, superclass); // Disallow altering super. May change going forward?
+		}
+
 		Map<String, LoxFunction> classmethods = new HashMap<>();
 		Map<String, LoxFunction> staticmethods = new HashMap<>();
 
@@ -184,16 +186,39 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
 		LoxClass metaklass = new LoxClass(stmt.name.lexeme, null, (LoxClass) superclass, staticmethods); // No metaclass for generated metaclasses, but it does get the superclass
 		LoxClass klass = new LoxClass(stmt.name.lexeme, metaklass, (LoxClass) superclass, classmethods);
-		
+
 		// Don't want to assign into the 'super' scope, so remove it
 		if (stmt.superclass != null) {
 			environment = environment.enclosing;
 		}
-		
+
 		environment.assign(stmt.name, klass); // By splitting, methods can refer to eachothe
 		environment.updateConstant(stmt.name, stmt.constant); // After creating class, set its const status
 
 		return null;
+	}
+
+	@Override
+	public Void visitTryStmt(Stmt.Try stmt) {
+		
+		try {
+			execute(stmt.body);
+		} catch (Exception.Panic panic) {
+			if (stmt.catches.containsKey(panic.code)) {
+				execute(stmt.catches.get(panic.code));
+			} else if (stmt.catches.containsKey(-1.0)) {
+				execute(stmt.catches.get(-1.0));
+			} else {
+				throw panic;
+			}
+		}
+
+		return null;
+	}
+	
+	@Override
+	public Void visitPanicStmt(Stmt.Panic stmt) {
+		throw new Exception.Panic(stmt.code, "Uncaught panic: Code " + stmt.code);
 	}
 
 	//~ Expression Evaluation

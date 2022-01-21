@@ -38,5 +38,14 @@ abstract class Exception extends RuntimeException {
 			super(message);
 		}
 	}
+
+	static class Panic extends Exception {
+		final Double code;
+
+		public Panic(Double code, String message) {
+			super(message);
+			this.code = code;
+		}
+	}
 }
 	

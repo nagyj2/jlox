@@ -44,6 +44,7 @@ enum TokenType {
 	// Keywords.
 	AND,
 	BREAK,
+	CATCH,
 	CLASS,
 	DO,
 	ELSE,
@@ -54,12 +55,14 @@ enum TokenType {
 	LET,
 	NIL,
 	OR,
+	PANIC,
 	PRINT,
 	RETURN,
 	STATIC,
 	SUPER,
 	THIS,
 	TRUE,
+	TRY,
 	VAR,
 	WHILE,
 

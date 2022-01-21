@@ -2,7 +2,9 @@ package com.craftinginterpreters.jlox;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.craftinginterpreters.jlox.TokenType.*;
 
@@ -232,6 +234,12 @@ public class Parser {
 		if (match(RETURN)) {
 			return returnStatement();
 		}
+		if (match(TRY)) {
+			return tryStatement();
+		}
+		if (match(PANIC)) {
+			return panicStatement();
+		}
 
 		return expressionStatement();
 	}
@@ -378,6 +386,48 @@ public class Parser {
 
 		REPLSemicolon();
 		return new Stmt.Return(keyword, value);
+	}
+
+	//* Parse a try statement
+	private Stmt tryStatement() {
+		Token keyword = previous();
+		consume(LEFT_CURLY, "Expected '{' before try body.");
+		Stmt body = new Stmt.Block(block());
+
+		consume(CATCH, "Try statements require at least one catch.");
+		Map<Double, Stmt> catches = new HashMap<>();
+		do {
+			Double code;
+			if (match(NUMBER)) {
+				code = (double) previous().literal;
+			} else {
+				code = -1.0;
+			}
+
+			if (catches.containsKey(code)) {
+				error(previous(), "Catch code must be unique.");
+			}
+			
+			consume(LEFT_CURLY, "Expected '{' before catch body.");
+			Stmt clause = new Stmt.Block(block());
+
+			catches.put(code, clause);
+		} while (match(CATCH));
+
+		return new Stmt.Try(keyword, body, catches);
+	}
+
+	//* Parse a panic statement with an optional code
+	private Stmt panicStatement() {
+		Token keyword = previous();
+		Double code = -1.0;
+		if (match(NUMBER))
+			code = (double) previous().literal;
+		else if (match(MINUS))
+			Lox.error(previous(), "Expected number code.");
+
+		REPLSemicolon();
+		return new Stmt.Panic(keyword, code);
 	}
 
 	//* Parse an expression statement.
@@ -994,7 +1044,7 @@ public class Parser {
 	//* Requires a semicolon if NOT in REPL mode.
 	private void REPLSemicolon(){
 		if (!isREPL || !isAtEnd())
-			consume(SEMICOLON, "Expected ';' after variable declaration.");
+			consume(SEMICOLON, "Expected ';' after statement.");
 
 	}
 

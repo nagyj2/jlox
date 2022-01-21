@@ -10,7 +10,7 @@ public class LoxFunction implements LoxCallable {
 
 	LoxFunction(Expr.Lambda declaration, Environment closure, boolean isInitializer) {
 		this.declaration = declaration;
-		this.closure = closure;
+		this.closure = closure; // surrounding environment
 		this.isInitializer = isInitializer;
 	}
 

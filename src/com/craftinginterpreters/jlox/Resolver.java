@@ -214,6 +214,25 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		endScope();
 		return null;
 	}
+
+	@Override
+	public Void visitTryStmt(Stmt.Try stmt) {
+		resolve(stmt.body);
+
+		for (Stmt clause : stmt.catches.values()) {
+			resolve(clause);
+		}
+
+		return null;
+	}
+	
+	@Override
+	public Void visitPanicStmt(Stmt.Panic stmt) {
+		// Should panic be allowed everywhere? I think so
+		return null;
+	}
+
+	//~ Expressions
 	
 	@Override
 	public Void visitSuperExpr(Expr.Super expr) {
@@ -226,8 +245,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 		// b/c we defined super in the scope immediately before the class' we will always catch it there
 		return null;
 	}
-
-	//~ Expressions
 
 	@Override
 	public Void visitLambdaExpr(Expr.Lambda expr) {
