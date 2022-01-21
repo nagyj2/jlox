@@ -91,9 +91,9 @@ arguments       -> assignment ( "," assignment )* ;
 - Lambda functions
 - **BROKEN** Multiple variable declaration within `var` using `,`
 - Constant declarations
-  - func statements **ARE NOT** constants
+  - func statements **CAN** constants
   - parameters **ARE NOT** constants 
-  - classes **ARE NOT** constants
+  - classes **CAN** constants
 - Static methods
 - Getters
 - Constant folding

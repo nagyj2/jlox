@@ -828,6 +828,3 @@ r = f--; // catch removed
 print f;
 print r;
 
-// f--;
-
-// print f;
