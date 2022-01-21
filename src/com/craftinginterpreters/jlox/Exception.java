@@ -31,5 +31,12 @@ abstract class Exception extends RuntimeException {
 			this.token = token;
 		}
 	}
+
+	static class Generic extends Exception {
+
+		public Generic(String message) {
+			super(message);
+		}
+	}
 }
 	

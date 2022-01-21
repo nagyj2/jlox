@@ -36,6 +36,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 			Lox.runtimeError(error);
 		} catch (Exception.Break error) {
 			Lox.runtimeError(new Exception.Runtime(error.token, "Unexpected '" + error.token.lexeme + "' outside loop or 'do'."));
+		} catch (Exception.Generic error) {
+			Lox.runtimeError(error);
 		}
 	}
 	
